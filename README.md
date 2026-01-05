@@ -1,6 +1,6 @@
-# tlt.github.io
+# DutchEZ 🧀
 
-Bill Splitter Pro - A web application for splitting complex bills with quantities and shareable links.
+Make bill splitting a Brie-ze.
 
 ## Features
 
