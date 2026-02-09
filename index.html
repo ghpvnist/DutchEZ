@@ -1,417 +1,544 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DutchEZ 🧀</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .sheet-input { border: 1px solid #e2e8f0; padding: 4px 8px; border-radius: 4px; width: 100%; font-size: 0.875rem; }
-        .sheet-input:focus { outline: 2px solid #f59e0b; border-color: transparent; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DutchEZ 🧀</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sheet-input {
+      border: 1px solid #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 0.875rem;
+    }
 
-        .checkbox-custom { width: 1.1rem; height: 1.1rem; cursor: pointer; accent-color: #f59e0b; }
+    .sheet-input:focus {
+      outline: 2px solid #f59e0b;
+      border-color: transparent;
+    }
 
-        #copy-toast { display: none; }
-        .menu-item { transition: all 0.2s; }
-        .menu-item:hover { transform: translateY(-2px); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .checkbox-custom {
+      width: 1.1rem;
+      height: 1.1rem;
+      cursor: pointer;
+      accent-color: #f59e0b;
+    }
 
-        /* 🧀 Custom Cheese Hole Pattern 🧀 */
-        body {
-            /* Base cheese color */
-            background-color: #ffd440;
+    #copy-toast {
+      display: none;
+    }
 
-            background-image:
-                /* 1. STAGGERED ROW: Front Light Circle (Hole Floor) */
-                radial-gradient(circle, #FFF5A0 22%, transparent 23%),
-                /* 2. STAGGERED ROW: Back Dark Circle (Deep Shadow) */
-                radial-gradient(circle, #f59e0b 25%, transparent 26%),
+    .menu-item {
+      transition: all 0.2s;
+    }
 
-                /* 3. MAIN ROW: Front Light Circle (Hole Floor) */
-                radial-gradient(circle, #FFF5A0 22%, transparent 23%),
-                /* 4. MAIN ROW: Back Dark Circle (Deep Shadow) */
-                radial-gradient(circle, #f59e0b 25%, transparent 26%);
+    .menu-item:hover {
+      transform: translateY(-2px);
+    }
 
-            /* Increased tile size */
-            background-size: 200px 200px;
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
 
-            background-position:
-                /* Staggered Row (Centered in the new 200px tile: 100px center + 3px offset) */
-                103px 103px,  /* Light circle */
-                100px 100px,  /* Dark circle base */
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
 
-                /* Main Row (Corner of tile - unchanged) */
-                3px 3px,    /* Light circle */
-                0px 0px;    /* Dark circle base */
+    /* 🧀 Custom Cheese Hole Pattern 🧀 */
+    body {
+      /* Base cheese color */
+      background-color: #ffd440;
 
-            min-height: 100vh;
-        }
-    </style>
+      background-image:
+        /* 1. STAGGERED ROW: Front Light Circle (Hole Floor) */
+        radial-gradient(circle, #FFF5A0 22%, transparent 23%),
+        /* 2. STAGGERED ROW: Back Dark Circle (Deep Shadow) */
+        radial-gradient(circle, #f59e0b 25%, transparent 26%),
+
+        /* 3. MAIN ROW: Front Light Circle (Hole Floor) */
+        radial-gradient(circle, #FFF5A0 22%, transparent 23%),
+        /* 4. MAIN ROW: Back Dark Circle (Deep Shadow) */
+        radial-gradient(circle, #f59e0b 25%, transparent 26%);
+
+      /* Increased tile size */
+      background-size: 200px 200px;
+
+      background-position:
+        /* Staggered Row (Centered in the new 200px tile: 100px center + 3px offset) */
+        103px 103px,
+        /* Light circle */
+        100px 100px,
+        /* Dark circle base */
+
+        /* Main Row (Corner of tile - unchanged) */
+        3px 3px,
+        /* Light circle */
+        0px 0px;
+      /* Dark circle base */
+
+      min-height: 100vh;
+    }
+  </style>
 </head>
+
 <body class="p-4 md:p-8 text-slate-800">
-    <div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden border border-slate-200">
-        <div class="bg-amber-100 p-6 text-slate-900 flex flex-wrap justify-between items-center gap-4">
+  <div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden border border-slate-200">
+    <div class="bg-amber-100 p-6 text-slate-900 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">DutchEZ <span class="text-amber-500">🧀</span></h1>
+        <p class="text-slate-600 text-sm">Make bill splitting a Brie-ze</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="copyShareLink()"
+          class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded transition flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Copy Share Link
+        </button>
+        <button onclick="resetAll()"
+          class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1 rounded transition">Reset</button>
+      </div>
+    </div>
+
+    <div class="p-6 space-y-8">
+      <section>
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">1. Diners</h2>
+        <div class="flex flex-wrap gap-2 mb-3" id="people-tags"></div>
+        <div class="flex gap-2 items-center flex-wrap">
+          <input type="text" id="person-input" placeholder="Name" class="sheet-input max-w-[200px]"
+            onkeydown="if(event.key==='Enter') addPerson()">
+          <button onclick="addPerson()"
+            class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-medium text-sm transition">Add
+            Person</button>
+          <div id="selected-person-indicator"
+            class="ml-4 text-xs text-slate-500 hidden bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+            <span class="font-bold text-amber-500">Selected:</span> <span id="selected-person-name"
+              class="text-amber-700 font-bold ml-1"></span>
+            <button onclick="clearSelection()" class="ml-2 text-amber-400 hover:text-red-500 font-bold">&times;</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="flex justify-between items-end mb-4">
+          <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest text-center md:text-left">2. Menu</h2>
+        </div>
+
+        <div class="flex items-center border-b border-slate-200 mb-4 overflow-hidden">
+          <div id="restaurant-tabs" class="flex gap-1 overflow-x-auto no-scrollbar pb-1"></div>
+          <button onclick="createNewMenu()"
+            class="ml-2 px-3 py-1 text-sm font-bold text-amber-600 hover:bg-amber-50 rounded bg-transparent border border-amber-200 transition"
+            title="Create New Menu Tab">+</button>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4 flex gap-2 items-center flex-wrap">
+          <span class="text-xs font-bold text-slate-400 uppercase mr-2">Add to Menu:</span>
+          <input type="text" id="custom-item-name" placeholder="Item name (e.g. Pizza)"
+            class="sheet-input max-w-[200px]">
+          <input type="number" id="custom-item-price" placeholder="Price" step="0.01"
+            class="sheet-input max-w-[100px] font-mono">
+          <input type="text" id="custom-item-category" placeholder="Category (optional)"
+            class="sheet-input max-w-[150px]" list="category-suggestions">
+          <datalist id="category-suggestions">
+            <option value="Entree"></option>
+            <option value="Appetizer"></option>
+            <option value="Drinks"></option>
+          </datalist>
+          <button onclick="addItemToCurrentMenu()"
+            class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-medium text-sm transition whitespace-nowrap">
+            + Add Item
+          </button>
+        </div>
+
+        <div id="menu-container"></div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 text-center md:text-left">3.
+          Individual Orders</h2>
+        <div id="orders-container" class="space-y-6"></div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 text-center md:text-left">4. Shared
+          Items</h2>
+        <div class="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
+          <table class="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] text-slate-400 uppercase font-black">
+                <th class="py-3 px-2">Item</th>
+                <th class="py-3 px-2 w-24">Price ($)</th>
+                <th class="py-3 px-2 w-20">Qty</th>
+                <th class="py-3 px-2">Shared By</th>
+                <th class="py-3 px-2 w-12 text-center"></th>
+              </tr>
+            </thead>
+            <tbody id="shared-items-rows"></tbody>
+          </table>
+        </div>
+        <button onclick="addSharedItem()"
+          class="mt-4 inline-flex items-center text-amber-600 font-bold text-sm hover:underline">
+          <span class="mr-1 text-lg">+</span> Add Shared Item
+        </button>
+      </section>
+
+      <section class="pt-6 border-t border-slate-100">
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">5. Final Breakdown</h2>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">DutchEZ <span class="text-amber-500">🧀</span></h1>
-                <p class="text-slate-600 text-sm">Make bill splitting a Brie-ze</p>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tax (%)</label>
+              <input type="number" id="tax-percent" value="9.0" step="0.1" oninput="saveAndCalc(); validateBillTotal();"
+                class="sheet-input font-mono">
             </div>
-            <div class="flex gap-2">
-                <button onclick="copyShareLink()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded transition flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    Copy Share Link
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Tip</label>
+                <button id="tip-mode-toggle" onclick="toggleTipMode()"
+                  class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-bold transition">
+                  %
                 </button>
-                <button onclick="resetAll()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1 rounded transition">Reset</button>
+              </div>
+              <input type="number" id="tip-percent" value="18.0" step="0.5"
+                oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono">
+              <input type="number" id="tip-dollar" step="0.01" placeholder="0.00"
+                oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono hidden">
             </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total Bill ($)</label>
+              <input type="number" id="total-bill" step="0.01" placeholder="Enter total from receipt"
+                class="sheet-input font-mono" oninput="validateBillTotal()">
+            </div>
+            <div>
+              <button onclick="calculateBill()"
+                class="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-4 py-2 rounded transition">
+                Calculate Bill
+              </button>
+            </div>
+          </div>
+          <div id="bill-error" class="text-red-600 text-xs font-bold mt-2 hidden"></div>
         </div>
-
-        <div class="p-6 space-y-8">
-            <section>
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">1. Diners</h2>
-                <div class="flex flex-wrap gap-2 mb-3" id="people-tags"></div>
-                <div class="flex gap-2 items-center flex-wrap">
-                    <input type="text" id="person-input" placeholder="Name" class="sheet-input max-w-[200px]" onkeydown="if(event.key==='Enter') addPerson()">
-                    <button onclick="addPerson()" class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-medium text-sm transition">Add Person</button>
-                    <div id="selected-person-indicator" class="ml-4 text-xs text-slate-500 hidden bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
-                        <span class="font-bold text-amber-500">Selected:</span> <span id="selected-person-name" class="text-amber-700 font-bold ml-1"></span>
-                        <button onclick="clearSelection()" class="ml-2 text-amber-400 hover:text-red-500 font-bold">&times;</button>
-                    </div>
-                </div>
-            </section>
-
-            <section>
-                <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest text-center md:text-left">2. Menu</h2>
-                </div>
-
-                <div class="flex items-center border-b border-slate-200 mb-4 overflow-hidden">
-                    <div id="restaurant-tabs" class="flex gap-1 overflow-x-auto no-scrollbar pb-1"></div>
-                    <button onclick="createNewMenu()" class="ml-2 px-3 py-1 text-sm font-bold text-amber-600 hover:bg-amber-50 rounded bg-transparent border border-amber-200 transition" title="Create New Menu Tab">+</button>
-                </div>
-
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4 flex gap-2 items-center flex-wrap">
-                    <span class="text-xs font-bold text-slate-400 uppercase mr-2">Add to Menu:</span>
-                    <input type="text" id="custom-item-name" placeholder="Item name (e.g. Pizza)" class="sheet-input max-w-[200px]">
-                    <input type="number" id="custom-item-price" placeholder="Price" step="0.01" class="sheet-input max-w-[100px] font-mono">
-                    <input type="text" id="custom-item-category" placeholder="Category (optional)" class="sheet-input max-w-[150px]" list="category-suggestions">
-                    <datalist id="category-suggestions">
-                        <option value="Entree"></option>
-                        <option value="Appetizer"></option>
-                        <option value="Drinks"></option>
-                    </datalist>
-                    <button onclick="addItemToCurrentMenu()" class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-medium text-sm transition whitespace-nowrap">
-                        + Add Item
-                    </button>
-                </div>
-
-                <div id="menu-container"></div>
-            </section>
-
-            <section>
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 text-center md:text-left">3. Individual Orders</h2>
-                <div id="orders-container" class="space-y-6"></div>
-            </section>
-
-            <section>
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 text-center md:text-left">4. Shared Items</h2>
-                <div class="overflow-x-auto -mx-6 md:mx-0 px-6 md:px-0">
-                    <table class="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr class="border-b border-slate-200 text-[11px] text-slate-400 uppercase font-black">
-                                <th class="py-3 px-2">Item</th>
-                                <th class="py-3 px-2 w-24">Price ($)</th>
-                                <th class="py-3 px-2 w-20">Qty</th>
-                                <th class="py-3 px-2">Shared By</th>
-                                <th class="py-3 px-2 w-12 text-center"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="shared-items-rows"></tbody>
-                    </table>
-                </div>
-                <button onclick="addSharedItem()" class="mt-4 inline-flex items-center text-amber-600 font-bold text-sm hover:underline">
-                    <span class="mr-1 text-lg">+</span> Add Shared Item
-                </button>
-            </section>
-
-            <section class="pt-6 border-t border-slate-100">
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">5. Final Breakdown</h2>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tax (%)</label>
-                            <input type="number" id="tax-percent" value="9.0" step="0.1" oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono">
-                        </div>
-                        <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Tip</label>
-                                <button id="tip-mode-toggle" onclick="toggleTipMode()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-bold transition">
-                                    %
-                                </button>
-                            </div>
-                            <input type="number" id="tip-percent" value="18.0" step="0.5" oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono">
-                            <input type="number" id="tip-dollar" step="0.01" placeholder="0.00" oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono hidden">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total Bill ($)</label>
-                            <input type="number" id="total-bill" step="0.01" placeholder="Enter total from receipt" class="sheet-input font-mono" oninput="validateBillTotal()">
-                        </div>
-                        <div>
-                            <button onclick="calculateBill()" class="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-4 py-2 rounded transition">
-                                Calculate Bill
-                            </button>
-                        </div>
-                    </div>
-                    <div id="bill-error" class="text-red-600 text-xs font-bold mt-2 hidden"></div>
-                </div>
-                <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
-            </section>
-        </div>
+        <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+      </section>
     </div>
+  </div>
 
-    <div id="copy-toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold animate-bounce z-50">
-        Link Copied to Clipboard! 🚀
-    </div>
+  <div id="copy-toast"
+    class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold animate-bounce z-50">
+    Link Copied to Clipboard! 🚀
+  </div>
 
-    <script>
-        // Initial Demo Data
-        const DEMO_RESTAURANT = {
-            "TLT & Grill": [
-                { category: "BBQ (烧烤)", name: "Lamb (羊肉串)", price: 3.75 },
-                { category: "BBQ (烧烤)", name: "Beef (牛肉串)", price: 3.75 },
-                { category: "BBQ (烧烤)", name: "Chicken (鸡肉串)", price: 3.50 },
-                { category: "BBQ (烧烤)", name: "Chicken Wings (烤鸡翅)", price: 4.25 },
-                { category: "BBQ (烧烤)", name: "Squid Tentacles (烤鱿鱼须)", price: 3.99 },
-                { category: "BBQ (烧烤)", name: "Scallop (烤扇贝 - 6pcs)", price: 12.99 },
-                { category: "BBQ (烧烤)", name: "Oyster (烤生蚝)", price: 3.99 },
-                { category: "BBQ (烧烤)", name: "Shrimp (烤虾)", price: 1.99 },
-                { category: "BBQ (烧烤)", name: "Sausage (烤肠)", price: 1.99 },
-                { category: "BBQ (烧烤)", name: "Chicken Gizzard (烤鸡胗)", price: 1.99 },
-                { category: "BBQ (烧烤)", name: "Chicken Heart (烤鸡心)", price: 1.99 },
-                { category: "BBQ (烧烤)", name: "Beef Tendon (烤牛筋)", price: 2.99 },
-                { category: "BBQ (烧烤)", name: "Beef Back Strap (烤牛板筋)", price: 2.99 },
-                { category: "BBQ (烧烤)", name: "Chicken Skin (烤鸡皮)", price: 2.99 },
-                { category: "BBQ (烧烤)", name: "Pork Intestine (烤肥肠)", price: 3.99 },
-                { category: "BBQ (烧烤)", name: "Taiwanese Sausage (烤台湾烤肠)", price: 3.99 },
-                { category: "BBQ (烧烤)", name: "Grilled Eggplant (烤全茄)", price: 8.99 },
-                { category: "BBQ (烧烤)", name: "Corn (烤玉米)", price: 2.50 },
-                { category: "BBQ (烧烤)", name: "Chinese Chives (烤韭菜)", price: 2.50 },
-                { category: "BBQ (烧烤)", name: "String Beans (烤豆角)", price: 2.50 },
-                { category: "BBQ (烧烤)", name: "Potato (烤土豆片)", price: 1.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Egg Fried Rice (蛋炒饭)", price: 13.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Yangzhou Fried Rice (扬州炒饭)", price: 14.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Wonton Soup (馄饨)", price: 13.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Doughboy Soup (疙瘩汤)", price: 13.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Cold Noodle (冷面)", price: 13.99 },
-                { category: "Rice and Soup (地方小吃)", name: "Spicy Vegetables (麻辣烫)", price: 14.99 },
-                { category: "Salad (凉拌菜)", name: "Pork & Cucumber Salad (肘花拍黄瓜)", price: 8.99 },
-                { category: "Salad (凉拌菜)", name: "Seaweed with Garlic Sauce (蒜汁海带丝)", price: 8.99 },
-                { category: "Salad (凉拌菜)", name: "Spicy Potato Salad (呛拌土豆丝)", price: 8.99 },
-                { category: "Salad (凉拌菜)", name: "Home Style Salad (家常凉菜)", price: 8.99 },
-                { category: "Entree (特色小炒)", name: "Sweet and Sour Pork Tenderloin (锅包肉)", price: 20.99 },
-                { category: "Entree (特色小炒)", name: "Bell Pepper with Dry Tofu (尖椒干豆腐)", price: 16.99 },
-                { category: "Entree (特色小炒)", name: "Chill Cabbage (火爆头菜)", price: 15.99 },
-                { category: "Entree (特色小炒)", name: "Fried Sweet Potato (拔丝地瓜)", price: 16.99 }
-            ]
-        };
+  <script>
+    // Initial Demo Data
+    const DEMO_RESTAURANT = {
+      "TLT & Grill": [
+        { "category": "Popular", "name": "Oyster(1pc)", "price": 3.5 },
+        { "category": "Popular", "name": "Fish Tofu(1pc)", "price": 2.75 },
+        { "category": "Popular", "name": "Sausage(1pc)", "price": 2.25 },
+        { "category": "Popular", "name": "Beef Tendon(1pc)", "price": 2.75 },
+        { "category": "Popular", "name": "Chicken Wings(1pc)", "price": 3.75 },
+        { "category": "Popular", "name": "Squid(1pc)", "price": 2.25 },
+        { "category": "Popular", "name": "Grill Eggplant(1pc)", "price": 7.99 },
+        { "category": "Popular", "name": "Chinese Chives(1pc)", "price": 2.25 },
+        { "category": "Popular", "name": "Chicken Heart(1pc)", "price": 1.75 },
+        { "category": "Popular", "name": "Beef(1pc)", "price": 2.99 },
+        { "category": "Popular", "name": "Lamb(1pc)", "price": 2.99 },
+        { "category": "Popular", "name": "Lamb Kidney(1pc)", "price": 3.75 },
+        { "category": "BBQ", "name": "Squid Tentacles(1pc)", "price": 3.75 },
+        { "category": "BBQ", "name": "Chicken Skin(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Mushroom(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Lettuce(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Egg(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Scallop (6pcs)", "price": 12.99 },
+        { "category": "BBQ", "name": "Chicken(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Taiwanese Sausage(1pc)", "price": 3.75 },
+        { "category": "BBQ", "name": "String Beans(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Bread(1pc)", "price": 1.75 },
+        { "category": "BBQ", "name": "Eggplant(1pc)", "price": 1.75 },
+        { "category": "BBQ", "name": "Pig Feet(1pc)", "price": 7.99 },
+        { "category": "BBQ", "name": "Pollack(1pc)", "price": 9.99 },
+        { "category": "BBQ", "name": "Corn(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Pork Belly 1(pc)", "price": 2.99 },
+        { "category": "BBQ", "name": "Szechuan Style Duck Blood", "price": 12.99 },
+        { "category": "BBQ", "name": "Bacon Warp W. Quail Egg", "price": 4.99 },
+        { "category": "BBQ", "name": "Pork Aorta(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Pork Intestine(1pc)", "price": 3.75 },
+        { "category": "BBQ", "name": "Tofu Roll(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Yellow Croaker(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Grilled Squid(1pc)", "price": 12.99 },
+        { "category": "BBQ", "name": "Potato(1pc)", "price": 1.75 },
+        { "category": "BBQ", "name": "Chicken Gristle(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Bell Pepper(1pc)", "price": 1.99 },
+        { "category": "BBQ", "name": "Beef Back Strap(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Tofu Slice (10pcs)", "price": 2.75 },
+        { "category": "BBQ", "name": "Steam Bun(1pc)", "price": 1.75 },
+        { "category": "BBQ", "name": "Shrimp(1pc)", "price": 2.25 },
+        { "category": "BBQ", "name": "Quail(1pc)", "price": 7.99 },
+        { "category": "BBQ", "name": "Fish Ball(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Chicken Gizzard(1pc)", "price": 1.75 },
+        { "category": "BBQ", "name": "Bacon Mushrooms(1pc)", "price": 3.75 },
+        { "category": "BBQ", "name": "Chinese Sausage", "price": 2.99 },
+        { "category": "BBQ", "name": "Szechwan Tofu", "price": 11.99 },
+        { "category": "BBQ", "name": "Mini Lamb", "price": 6.99 },
+        { "category": "BBQ", "name": "Mini Beef", "price": 6.99 },
+        { "category": "BBQ", "name": "Mianjin", "price": 2.25 },
+        { "category": "BBQ", "name": "Tofu Skewer", "price": 1.99 },
+        { "category": "BBQ", "name": "Beef Tripe(1pc)", "price": 2.75 },
+        { "category": "BBQ", "name": "Enoki Mushroom(1pc)", "price": 2.75 },
+        { "category": "Salad", "name": "Shredded Dried Tofu & Onion", "price": 8.99 },
+        { "category": "Salad", "name": "Sliced Pig Leg W. Garlic Sauce", "price": 8.99 },
+        { "category": "Salad", "name": "Spicy Potato Salad", "price": 8.99 },
+        { "category": "Salad", "name": "Seaweed W. Ginger Sauce", "price": 8.99 },
+        { "category": "Salad", "name": "Home Style Salad", "price": 8.99 },
+        { "category": "Salad", "name": "Roast Peanut & Cucumber", "price": 8.99 },
+        { "category": "Salad", "name": "Pork & Cucumber", "price": 8.99 },
+        { "category": "Salad", "name": "Mix Salad", "price": 9.99 },
+        { "category": "Salad", "name": "Spinach And Peanuts Salad", "price": 11.99 },
+        { "category": "Salad", "name": "Marinade Pork Liver", "price": 8.99 },
+        { "category": "Salad", "name": "Shirataki Noodle Salad", "price": 11.99 },
+        { "category": "Chef's Special", "name": "Yangzhou Fried Rice", "price": 13.99 },
+        { "category": "Chef's Special", "name": "Egg Fried Rice", "price": 12.99 },
+        { "category": "Chef's Special", "name": "Sweet & Sour Pork", "price": 20.99 },
+        { "category": "Chef's Special", "name": "Tofu Slice W. Pepper", "price": 18.99 },
+        { "category": "Chef's Special", "name": "Potato Eggplant W. Pepper", "price": 18.99 },
+        { "category": "Chef's Special", "name": "Pickled Cabbage W. Pork Belly", "price": 20.99 },
+        { "category": "Local Special", "name": "Cold Noodle", "price": 12.99 },
+        { "category": "Local Special", "name": "Spicy Sour Noodle W. Pork Intestine", "price": 14.99 },
+        { "category": "Local Special", "name": "Wanton", "price": 12.99 },
+        { "category": "Local Special", "name": "Doughboy Soup", "price": 12.99 },
+        { "category": "Local Special", "name": "Spicy Vegetables With Soup", "price": 13.99 },
+        { "category": "Local Special", "name": "Rice", "price": 1.99 },
+        { "category": "Drinks", "name": "Sour Plum Soup", "price": 3.5 },
+        { "category": "Drinks", "name": "Arctic Ocean", "price": 3.5 },
+        { "category": "Drinks", "name": "Korean Soju", "price": 12.99 },
+        { "category": "Drinks", "name": "Diet Cola", "price": 1.99 },
+        { "category": "Drinks", "name": "Heineken", "price": 3.99 },
+        { "category": "Drinks", "name": "Iced Tea", "price": 3.5 },
+        { "category": "Drinks", "name": "Wanglaoji", "price": 2.99 },
+        { "category": "Drinks", "name": "Corona", "price": 3.99 },
+        { "category": "Drinks", "name": "Sapporo", "price": 7.99 },
+        { "category": "Drinks", "name": "Qingdao Beer", "price": 4.5 },
+        { "category": "Drinks", "name": "Sprite", "price": 1.99 },
+        { "category": "Drinks", "name": "Coke", "price": 1.99 },
+        { "category": "Drinks", "name": "Yogurt", "price": 3.99 },
+        { "category": "Drinks", "name": "Wusu Beer", "price": 9.99 },
+        { "category": "Drinks", "name": "Peanut Milk", "price": 3.5 },
+        { "category": "Drinks", "name": "Lychee Soda", "price": 3.5 },
+        { "category": "Drinks", "name": "Yanjing", "price": 6.0 },
+        { "category": "Drinks", "name": "Viee Soy Milk", "price": 3.5 },
+        { "category": "Drinks", "name": "Pear Soda", "price": 3.99 },
+        { "category": "Drinks", "name": "Orange Soda", "price": 3.99 },
+        { "category": "Drinks", "name": "Green Tea", "price": 3.5 },
+        { "category": "Drinks", "name": "Jasmine Green Tea", "price": 3.5 },
+        { "category": "Drinks", "name": "Tsingtao Beer Lager", "price": 9.99 },
+        { "category": "Drinks", "name": "Asahi", "price": 9.99 },
+        { "category": "Drinks", "name": "Orange Hot Beer", "price": 5.99 },
+        { "category": "Drinks", "name": "Hawaiian Drink", "price": 1.49 }
+      ]
+    };
 
-        let state = {
-            people: ["Me", "Friend 1"],
-            restaurants: JSON.parse(JSON.stringify(DEMO_RESTAURANT)),
-            selectedRestaurant: "TLT & Grill",
-            orders: {},
-            sharedItems: [],
-            tax: 9.0,
-            tip: 18.0,
-            tipMode: 'percent',
-            selectedPerson: null
-        };
+    let state = {
+      people: ["Me", "Friend 1"],
+      restaurants: JSON.parse(JSON.stringify(DEMO_RESTAURANT)),
+      selectedRestaurant: "TLT & Grill",
+      orders: {},
+      sharedItems: [],
+      tax: 9.0,
+      tip: 18.0,
+      tipMode: 'percent',
+      selectedPerson: null
+    };
 
-        function init() {
-            // Load state logic
-            state.people.forEach(p => { if (!state.orders[p]) state.orders[p] = []; });
-            if (!state.sharedItems) state.sharedItems = [];
+    function init() {
+      // Load state logic
+      state.people.forEach(p => { if (!state.orders[p]) state.orders[p] = []; });
+      if (!state.sharedItems) state.sharedItems = [];
 
-            // Initial default selection
-            if (!state.selectedPerson && state.people.length > 0) state.selectedPerson = state.people[0];
+      // Initial default selection
+      if (!state.selectedPerson && state.people.length > 0) state.selectedPerson = state.people[0];
 
-            // Priority 1: URL Parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const dataParam = urlParams.get('bill');
+      // Priority 1: URL Parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const dataParam = urlParams.get('bill');
 
-            if (dataParam) {
-                try {
-                    const urlDecoded = decodeURIComponent(dataParam);
-                    const decodedData = JSON.parse(decodeBase64Unicode(urlDecoded));
-                    state = { ...state, ...decodedData };
-                    if (!state.restaurants || Object.keys(state.restaurants).length === 0) {
-                        state.restaurants = JSON.parse(JSON.stringify(DEMO_RESTAURANT));
-                    }
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } catch (e) {
-                    console.error("Invalid share link", e);
-                    alert("Invalid share link.");
-                }
-            } else {
-                // Priority 2: LocalStorage
-                const saved = localStorage.getItem('bill_splitter_state');
-                if (saved) {
-                    try {
-                        const loaded = JSON.parse(saved);
-                        state = { ...state, ...loaded };
-                        if(state.customMenuItems) delete state.customMenuItems;
-                    } catch(e) { console.error(e); }
-                }
-            }
-
-            const restKeys = Object.keys(state.restaurants);
-            if (restKeys.length > 0 && !state.restaurants[state.selectedRestaurant]) {
-                state.selectedRestaurant = restKeys[0];
-            } else if (restKeys.length === 0) {
-                state.restaurants["My Menu"] = [];
-                state.selectedRestaurant = "My Menu";
-            }
-
-            document.getElementById('tax-percent').value = state.tax;
-            if (!state.tipMode) state.tipMode = 'percent';
-
-            const tipPercentInput = document.getElementById('tip-percent');
-            const tipDollarInput = document.getElementById('tip-dollar');
-            const toggleButton = document.getElementById('tip-mode-toggle');
-
-            if (state.tipMode === 'percent') {
-                tipPercentInput.value = state.tip;
-                tipPercentInput.classList.remove('hidden');
-                tipDollarInput.classList.add('hidden');
-                toggleButton.textContent = '%';
-            } else {
-                const totalSubtotal = getTotalSubtotal();
-                const tipDollar = totalSubtotal > 0 ? (totalSubtotal * state.tip / 100) : 0;
-                tipDollarInput.value = tipDollar.toFixed(2);
-                tipPercentInput.classList.add('hidden');
-                tipDollarInput.classList.remove('hidden');
-                toggleButton.textContent = '$';
-            }
-
-            renderAll();
+      if (dataParam) {
+        try {
+          const urlDecoded = decodeURIComponent(dataParam);
+          const decodedData = JSON.parse(decodeBase64Unicode(urlDecoded));
+          state = { ...state, ...decodedData };
+          if (!state.restaurants || Object.keys(state.restaurants).length === 0) {
+            state.restaurants = JSON.parse(JSON.stringify(DEMO_RESTAURANT));
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+          console.error("Invalid share link", e);
+          alert("Invalid share link.");
         }
-
-        // --- Core Functions ---
-
-        function createNewMenu() {
-            const name = prompt("Enter name for new menu (e.g., 'Pizza Place'):");
-            if (name && name.trim()) {
-                const cleanName = name.trim();
-                if (state.restaurants[cleanName]) {
-                    alert("Menu name already exists.");
-                    return;
-                }
-                state.restaurants[cleanName] = [];
-                state.selectedRestaurant = cleanName;
-                renderAll();
-            }
+      } else {
+        // Priority 2: LocalStorage
+        const saved = localStorage.getItem('bill_splitter_state');
+        if (saved) {
+          try {
+            const loaded = JSON.parse(saved);
+            state = { ...state, ...loaded };
+            if (state.customMenuItems) delete state.customMenuItems;
+          } catch (e) { console.error(e); }
         }
+      }
 
-        function deleteMenu(name) {
-            if (Object.keys(state.restaurants).length <= 1) {
-                alert("You must have at least one menu.");
-                return;
-            }
-            if (confirm(`Delete menu "${name}" and all its items?`)) {
-                delete state.restaurants[name];
-                state.selectedRestaurant = Object.keys(state.restaurants)[0];
-                renderAll();
-            }
+      const restKeys = Object.keys(state.restaurants);
+      if (restKeys.length > 0 && !state.restaurants[state.selectedRestaurant]) {
+        state.selectedRestaurant = restKeys[0];
+      } else if (restKeys.length === 0) {
+        state.restaurants["My Menu"] = [];
+        state.selectedRestaurant = "My Menu";
+      }
+
+      document.getElementById('tax-percent').value = state.tax;
+      if (!state.tipMode) state.tipMode = 'percent';
+
+      const tipPercentInput = document.getElementById('tip-percent');
+      const tipDollarInput = document.getElementById('tip-dollar');
+      const toggleButton = document.getElementById('tip-mode-toggle');
+
+      if (state.tipMode === 'percent') {
+        tipPercentInput.value = state.tip;
+        tipPercentInput.classList.remove('hidden');
+        tipDollarInput.classList.add('hidden');
+        toggleButton.textContent = '%';
+      } else {
+        const totalSubtotal = getTotalSubtotal();
+        const tipDollar = totalSubtotal > 0 ? (totalSubtotal * state.tip / 100) : 0;
+        tipDollarInput.value = tipDollar.toFixed(2);
+        tipPercentInput.classList.add('hidden');
+        tipDollarInput.classList.remove('hidden');
+        toggleButton.textContent = '$';
+      }
+
+      renderAll();
+    }
+
+    // --- Core Functions ---
+
+    function createNewMenu() {
+      const name = prompt("Enter name for new menu (e.g., 'Pizza Place'):");
+      if (name && name.trim()) {
+        const cleanName = name.trim();
+        if (state.restaurants[cleanName]) {
+          alert("Menu name already exists.");
+          return;
         }
+        state.restaurants[cleanName] = [];
+        state.selectedRestaurant = cleanName;
+        renderAll();
+      }
+    }
 
-        function addItemToCurrentMenu() {
-            const nameInput = document.getElementById('custom-item-name');
-            const priceInput = document.getElementById('custom-item-price');
-            const catInput = document.getElementById('custom-item-category');
+    function deleteMenu(name) {
+      if (Object.keys(state.restaurants).length <= 1) {
+        alert("You must have at least one menu.");
+        return;
+      }
+      if (confirm(`Delete menu "${name}" and all its items?`)) {
+        delete state.restaurants[name];
+        state.selectedRestaurant = Object.keys(state.restaurants)[0];
+        renderAll();
+      }
+    }
 
-            const name = nameInput.value.trim();
-            const price = parseFloat(priceInput.value);
-            const category = catInput.value.trim() || "Custom Items";
+    function addItemToCurrentMenu() {
+      const nameInput = document.getElementById('custom-item-name');
+      const priceInput = document.getElementById('custom-item-price');
+      const catInput = document.getElementById('custom-item-category');
 
-            if (name && price > 0) {
-                state.restaurants[state.selectedRestaurant].push({ name, price, category });
-                nameInput.value = '';
-                priceInput.value = '';
-                catInput.value = '';
-                renderMenu();
-                saveAndCalc();
-            } else {
-                alert("Please enter a valid name and price.");
-            }
+      const name = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      const category = catInput.value.trim() || "Custom Items";
+
+      if (name && price > 0) {
+        state.restaurants[state.selectedRestaurant].push({ name, price, category });
+        nameInput.value = '';
+        priceInput.value = '';
+        catInput.value = '';
+        renderMenu();
+        saveAndCalc();
+      } else {
+        alert("Please enter a valid name and price.");
+      }
+    }
+
+    function deleteItemFromMenu(index) {
+      const menuList = state.restaurants[state.selectedRestaurant];
+      if (!menuList || !menuList[index]) return;
+
+      const item = menuList[index];
+      const itemName = item.name;
+
+      // Check if used in orders
+      let isUsed = false;
+
+      // Check individual orders
+      Object.values(state.orders).forEach(userOrders => {
+        if (userOrders.some(order => order.itemName === itemName)) {
+          isUsed = true;
         }
+      });
 
-        function deleteItemFromMenu(index) {
-            const menuList = state.restaurants[state.selectedRestaurant];
-            if (!menuList || !menuList[index]) return;
-
-            const item = menuList[index];
-            const itemName = item.name;
-
-            // Check if used in orders
-            let isUsed = false;
-
-            // Check individual orders
-            Object.values(state.orders).forEach(userOrders => {
-                if (userOrders.some(order => order.itemName === itemName)) {
-                    isUsed = true;
-                }
-            });
-
-            // Check shared items
-            if (!isUsed) {
-                if (state.sharedItems.some(shared => shared.name === itemName)) {
-                    isUsed = true;
-                }
-            }
-
-            let confirmMessage = `Delete "${itemName}" from the menu?`;
-            if (isUsed) {
-                confirmMessage = `⚠️ "${itemName}" is currently in someone's order.\n\nDeleting it will remove it from ALL orders and update the totals.\n\nAre you sure?`;
-            }
-
-            if (confirm(confirmMessage)) {
-                // 1. Remove from menu
-                state.restaurants[state.selectedRestaurant].splice(index, 1);
-
-                // 2. Remove from individual orders
-                Object.keys(state.orders).forEach(person => {
-                    state.orders[person] = state.orders[person].filter(order => order.itemName !== itemName);
-                });
-
-                // 3. Remove from shared items
-                state.sharedItems = state.sharedItems.filter(shared => shared.name !== itemName);
-
-                renderMenu();
-                renderAll(); // Renders orders section too
-                saveAndCalc();
-            }
+      // Check shared items
+      if (!isUsed) {
+        if (state.sharedItems.some(shared => shared.name === itemName)) {
+          isUsed = true;
         }
+      }
 
-        // --- Render Functions ---
+      let confirmMessage = `Delete "${itemName}" from the menu?`;
+      if (isUsed) {
+        confirmMessage = `⚠️ "${itemName}" is currently in someone's order.\n\nDeleting it will remove it from ALL orders and update the totals.\n\nAre you sure?`;
+      }
 
-        function renderRestaurantTabs() {
-            const tabsContainer = document.getElementById('restaurant-tabs');
-            const restaurants = Object.keys(state.restaurants);
+      if (confirm(confirmMessage)) {
+        // 1. Remove from menu
+        state.restaurants[state.selectedRestaurant].splice(index, 1);
 
-            tabsContainer.innerHTML = restaurants.map(restaurant => {
-                const isActive = state.selectedRestaurant === restaurant;
-                const showDelete = isActive && restaurants.length > 1;
-                const paddingClass = showDelete ? 'pl-4 pr-8' : 'px-4';
+        // 2. Remove from individual orders
+        Object.keys(state.orders).forEach(person => {
+          state.orders[person] = state.orders[person].filter(order => order.itemName !== itemName);
+        });
 
-                return `
+        // 3. Remove from shared items
+        state.sharedItems = state.sharedItems.filter(shared => shared.name !== itemName);
+
+        renderMenu();
+        renderAll(); // Renders orders section too
+        saveAndCalc();
+      }
+    }
+
+    // --- Render Functions ---
+
+    function renderRestaurantTabs() {
+      const tabsContainer = document.getElementById('restaurant-tabs');
+      const restaurants = Object.keys(state.restaurants);
+
+      tabsContainer.innerHTML = restaurants.map(restaurant => {
+        const isActive = state.selectedRestaurant === restaurant;
+        const showDelete = isActive && restaurants.length > 1;
+        const paddingClass = showDelete ? 'pl-4 pr-8' : 'px-4';
+
+        return `
                 <div class="group relative flex items-center">
                     <button onclick="selectRestaurant('${restaurant.replace(/'/g, "\\'")}')"
-                            class="${paddingClass} py-2 text-sm font-bold transition whitespace-nowrap rounded-t-lg border-b-2 ${
-                                isActive
-                                    ? 'bg-amber-500 text-white border-amber-600'
-                                    : 'bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200'
-                            }">
+                            class="${paddingClass} py-2 text-sm font-bold transition whitespace-nowrap rounded-t-lg border-b-2 ${isActive
+            ? 'bg-amber-500 text-white border-amber-600'
+            : 'bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200'
+          }">
                         ${restaurant}
                     </button>
                     ${showDelete ? `
@@ -421,32 +548,32 @@
                     ` : ''}
                 </div>
             `;
-            }).join('');
-        }
+      }).join('');
+    }
 
-        function renderMenu() {
-            const container = document.getElementById('menu-container');
-            const menuItems = state.restaurants[state.selectedRestaurant] || [];
+    function renderMenu() {
+      const container = document.getElementById('menu-container');
+      const menuItems = state.restaurants[state.selectedRestaurant] || [];
 
-            if (menuItems.length === 0) {
-                container.innerHTML = `
+      if (menuItems.length === 0) {
+        container.innerHTML = `
                     <div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-xl text-slate-400">
                         <p class="mb-2">This menu is empty.</p>
                         <p class="text-xs">Use the "Add to Menu" form above to build it!</p>
                     </div>`;
-                return;
-            }
+        return;
+      }
 
-            const itemsByCategory = {};
-            menuItems.forEach((item, index) => {
-                const category = item.category || 'Other';
-                if (!itemsByCategory[category]) itemsByCategory[category] = [];
-                itemsByCategory[category].push({ ...item, originalIndex: index });
-            });
+      const itemsByCategory = {};
+      menuItems.forEach((item, index) => {
+        const category = item.category || 'Other';
+        if (!itemsByCategory[category]) itemsByCategory[category] = [];
+        itemsByCategory[category].push({ ...item, originalIndex: index });
+      });
 
-            container.innerHTML = Object.keys(itemsByCategory).map(category => {
-                const items = itemsByCategory[category];
-                return `
+      container.innerHTML = Object.keys(itemsByCategory).map(category => {
+        const items = itemsByCategory[category];
+        return `
                     <div class="mb-6">
                         <h3 class="text-sm font-bold text-slate-600 uppercase mb-3 pb-2 border-b border-slate-200">${category}</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -473,323 +600,323 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+      }).join('');
+    }
+
+    // --- Standard Logic ---
+
+    function encodeBase64Unicode(str) {
+      const utf8Bytes = new TextEncoder().encode(str);
+      let binary = '';
+      for (let i = 0; i < utf8Bytes.length; i++) binary += String.fromCharCode(utf8Bytes[i]);
+      return btoa(binary);
+    }
+
+    function decodeBase64Unicode(str) {
+      const binary = atob(str);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    }
+
+    function copyShareLink() {
+      try {
+        const encoded = encodeBase64Unicode(JSON.stringify(state));
+        const urlEncoded = encodeURIComponent(encoded);
+        const shareUrl = window.location.origin + window.location.pathname + "?bill=" + urlEncoded;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(() => showToast("Link Copied to Clipboard! 🚀"));
+        } else {
+          fallbackCopyToClipboard(shareUrl);
         }
+      } catch (e) { alert("Failed to copy link"); }
+    }
 
-        // --- Standard Logic ---
+    function fallbackCopyToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed"; textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus(); textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Link Copied to Clipboard! 🚀");
+      } catch (err) { prompt("Copy this link:", text); }
+      document.body.removeChild(textArea);
+    }
 
-        function encodeBase64Unicode(str) {
-            const utf8Bytes = new TextEncoder().encode(str);
-            let binary = '';
-            for (let i = 0; i < utf8Bytes.length; i++) binary += String.fromCharCode(utf8Bytes[i]);
-            return btoa(binary);
+    function showToast(message) {
+      const toast = document.getElementById('copy-toast');
+      toast.textContent = message;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    function saveAndCalc() {
+      state.tax = parseFloat(document.getElementById('tax-percent').value) || 0;
+      if (state.tipMode === 'percent') {
+        state.tip = parseFloat(document.getElementById('tip-percent').value) || 0;
+      } else {
+        const tipDollar = parseFloat(document.getElementById('tip-dollar').value) || 0;
+        const totalSubtotal = getTotalSubtotal();
+        state.tip = totalSubtotal > 0 ? (tipDollar / totalSubtotal * 100) : 0;
+      }
+      localStorage.setItem('bill_splitter_state', JSON.stringify(state));
+      calculate();
+      validateBillTotal();
+    }
+
+    function toggleTipMode() {
+      const tipPercentInput = document.getElementById('tip-percent');
+      const tipDollarInput = document.getElementById('tip-dollar');
+      const toggleButton = document.getElementById('tip-mode-toggle');
+      const totalSubtotal = getTotalSubtotal();
+
+      if (state.tipMode === 'percent') {
+        state.tipMode = 'dollar';
+        const tipPercent = parseFloat(tipPercentInput.value) || 0;
+        const tipDollar = totalSubtotal > 0 ? (totalSubtotal * tipPercent / 100) : 0;
+        tipDollarInput.value = tipDollar.toFixed(2);
+        tipPercentInput.classList.add('hidden');
+        tipDollarInput.classList.remove('hidden');
+        toggleButton.textContent = '$';
+      } else {
+        state.tipMode = 'percent';
+        const tipDollar = parseFloat(tipDollarInput.value) || 0;
+        const tipPercent = totalSubtotal > 0 ? (tipDollar / totalSubtotal * 100) : 0;
+        tipPercentInput.value = tipPercent.toFixed(2);
+        tipDollarInput.classList.add('hidden');
+        tipPercentInput.classList.remove('hidden');
+        toggleButton.textContent = '%';
+      }
+      saveAndCalc();
+    }
+
+    function getTotalSubtotal() {
+      let totalSubtotal = 0;
+      state.people.forEach(p => {
+        (state.orders[p] || []).forEach(o => totalSubtotal += (o.price || 0) * (o.quantity || 0));
+      });
+      (state.sharedItems || []).forEach(item => {
+        if (item.sharedBy && item.sharedBy.length > 0) totalSubtotal += (item.price || 0) * (item.quantity || 0);
+      });
+      return totalSubtotal;
+    }
+
+    function validateBillTotal() {
+      const totalBillInput = document.getElementById('total-bill');
+      const errorDiv = document.getElementById('bill-error');
+      const enteredTotalBill = parseFloat(totalBillInput.value) || 0;
+      const subtotal = getTotalSubtotal();
+
+      if (subtotal === 0 || enteredTotalBill === 0) {
+        errorDiv.classList.add('hidden');
+        return;
+      }
+
+      const taxRate = state.tax / 100;
+      const tipRate = state.tipMode === 'percent'
+        ? state.tip / 100
+        : (parseFloat(document.getElementById('tip-dollar').value) || 0) / subtotal;
+
+      const expectedTotalBill = subtotal * (1 + taxRate + tipRate);
+
+      if (Math.abs(enteredTotalBill - expectedTotalBill) > 0.05) {
+        errorDiv.textContent = `⚠️ Mismatch! Expected: $${expectedTotalBill.toFixed(2)}, Entered: $${enteredTotalBill.toFixed(2)}`;
+        errorDiv.classList.remove('hidden');
+      } else {
+        errorDiv.classList.add('hidden');
+      }
+    }
+
+    function calculateBill() {
+      const totalBillInput = document.getElementById('total-bill');
+      const errorDiv = document.getElementById('bill-error');
+      const taxPercentInput = document.getElementById('tax-percent');
+      const tipPercentInput = document.getElementById('tip-percent');
+      const tipDollarInput = document.getElementById('tip-dollar');
+
+      const taxPercent = parseFloat(taxPercentInput.value) || 0;
+      const enteredTotalBill = parseFloat(totalBillInput.value) || 0;
+      const subtotal = getTotalSubtotal();
+
+      if (subtotal === 0) {
+        errorDiv.textContent = "Please add items first.";
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      let tipPercent = 0;
+      if (state.tipMode === 'percent') {
+        tipPercent = parseFloat(tipPercentInput.value) || 0;
+      } else {
+        const tipDollar = parseFloat(tipDollarInput.value) || 0;
+        tipPercent = subtotal > 0 ? (tipDollar / subtotal * 100) : 0;
+      }
+
+      // Case 1: Reverse Calc Tax (Tip & Total Bill exists, Tax is 0)
+      if (tipPercent > 0 && enteredTotalBill > 0 && taxPercent === 0) {
+        const tipRate = tipPercent / 100;
+        const calculatedTaxPercent = ((enteredTotalBill / subtotal) - 1 - tipRate) * 100;
+
+        if (calculatedTaxPercent >= 0 && calculatedTaxPercent <= 100) {
+          taxPercentInput.value = calculatedTaxPercent.toFixed(2);
+          state.tax = calculatedTaxPercent;
+          errorDiv.classList.add('hidden');
+          saveAndCalc();
+        } else {
+          errorDiv.textContent = `⚠️ Cannot calculate tax. Check inputs.`;
+          errorDiv.classList.remove('hidden');
         }
+      }
+      // Case 2: Reverse Calc Tip (Tax & Total Bill exists, Tip is 0)
+      else if (taxPercent > 0 && enteredTotalBill > 0 && tipPercent === 0) {
+        const taxRate = taxPercent / 100;
+        const calculatedTipPercent = ((enteredTotalBill / subtotal) - 1 - taxRate) * 100;
 
-        function decodeBase64Unicode(str) {
-            const binary = atob(str);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-            return new TextDecoder().decode(bytes);
+        if (calculatedTipPercent >= 0 && calculatedTipPercent <= 100) {
+          if (state.tipMode === 'percent') {
+            tipPercentInput.value = calculatedTipPercent.toFixed(2);
+          } else {
+            tipDollarInput.value = (subtotal * calculatedTipPercent / 100).toFixed(2);
+          }
+          state.tip = calculatedTipPercent;
+          errorDiv.classList.add('hidden');
+          saveAndCalc();
+        } else {
+          errorDiv.textContent = `⚠️ Cannot calculate tip. Check inputs.`;
+          errorDiv.classList.remove('hidden');
         }
+      }
+      // Case 3: Forward Calc Total Bill (Tax & Tip exists)
+      else if (taxPercent > 0 && tipPercent > 0) {
+        const taxRate = taxPercent / 100;
+        const tipRate = tipPercent / 100;
+        const expectedTotal = subtotal * (1 + taxRate + tipRate);
 
-        function copyShareLink() {
-            try {
-                const encoded = encodeBase64Unicode(JSON.stringify(state));
-                const urlEncoded = encodeURIComponent(encoded);
-                const shareUrl = window.location.origin + window.location.pathname + "?bill=" + urlEncoded;
+        totalBillInput.value = expectedTotal.toFixed(2);
+        errorDiv.classList.add('hidden');
+        validateBillTotal();
+        saveAndCalc();
+      } else {
+        errorDiv.textContent = "Please enter tax and tip (or total bill) to calculate";
+        errorDiv.classList.remove('hidden');
+      }
+    }
 
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(shareUrl).then(() => showToast("Link Copied to Clipboard! 🚀"));
-                } else {
-                    fallbackCopyToClipboard(shareUrl);
-                }
-            } catch (e) { alert("Failed to copy link"); }
-        }
+    function addPerson() {
+      const input = document.getElementById('person-input');
+      let name = input.value.trim();
+      if (!name) {
+        let friendNum = 1;
+        while (state.people.includes(`Friend ${friendNum}`)) friendNum++;
+        name = `Friend ${friendNum}`;
+      }
+      if (!state.people.includes(name)) {
+        state.people.push(name);
+        state.orders[name] = [];
+        if (!state.selectedPerson) state.selectedPerson = name;
+        input.value = '';
+        renderAll();
+      }
+    }
 
-        function fallbackCopyToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; textArea.style.opacity = "0";
-            document.body.appendChild(textArea);
-            textArea.focus(); textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("Link Copied to Clipboard! 🚀");
-            } catch (err) { prompt("Copy this link:", text); }
-            document.body.removeChild(textArea);
-        }
+    function selectPerson(name) { state.selectedPerson = name; renderAll(); }
+    function clearSelection() { state.selectedPerson = null; renderAll(); }
 
-        function showToast(message) {
-            const toast = document.getElementById('copy-toast');
-            toast.textContent = message;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
-        }
+    function removePerson(name) {
+      state.people = state.people.filter(p => p !== name);
+      delete state.orders[name];
+      state.sharedItems.forEach(item => {
+        if (item.sharedBy) item.sharedBy = item.sharedBy.filter(p => p !== name);
+      });
+      if (state.selectedPerson === name) state.selectedPerson = state.people[0] || null;
+      renderAll();
+    }
 
-        function saveAndCalc() {
-            state.tax = parseFloat(document.getElementById('tax-percent').value) || 0;
-            if (state.tipMode === 'percent') {
-                state.tip = parseFloat(document.getElementById('tip-percent').value) || 0;
-            } else {
-                const tipDollar = parseFloat(document.getElementById('tip-dollar').value) || 0;
-                const totalSubtotal = getTotalSubtotal();
-                state.tip = totalSubtotal > 0 ? (tipDollar / totalSubtotal * 100) : 0;
-            }
-            localStorage.setItem('bill_splitter_state', JSON.stringify(state));
-            calculate();
-            validateBillTotal();
-        }
+    function selectRestaurant(name) {
+      state.selectedRestaurant = name;
+      renderAll();
+    }
 
-        function toggleTipMode() {
-            const tipPercentInput = document.getElementById('tip-percent');
-            const tipDollarInput = document.getElementById('tip-dollar');
-            const toggleButton = document.getElementById('tip-mode-toggle');
-            const totalSubtotal = getTotalSubtotal();
+    function addOrder(personName, itemName, price) {
+      if (!state.orders[personName]) state.orders[personName] = [];
+      state.orders[personName].push({ itemName, quantity: 1, price });
+      renderAll();
+    }
 
-            if (state.tipMode === 'percent') {
-                state.tipMode = 'dollar';
-                const tipPercent = parseFloat(tipPercentInput.value) || 0;
-                const tipDollar = totalSubtotal > 0 ? (totalSubtotal * tipPercent / 100) : 0;
-                tipDollarInput.value = tipDollar.toFixed(2);
-                tipPercentInput.classList.add('hidden');
-                tipDollarInput.classList.remove('hidden');
-                toggleButton.textContent = '$';
-            } else {
-                state.tipMode = 'percent';
-                const tipDollar = parseFloat(tipDollarInput.value) || 0;
-                const tipPercent = totalSubtotal > 0 ? (tipDollar / totalSubtotal * 100) : 0;
-                tipPercentInput.value = tipPercent.toFixed(2);
-                tipDollarInput.classList.add('hidden');
-                tipPercentInput.classList.remove('hidden');
-                toggleButton.textContent = '%';
-            }
-            saveAndCalc();
-        }
+    function addOrderToSelectedPerson(itemName, price) {
+      if (state.people.length === 0) { alert("Add a person first!"); return; }
+      addOrder(state.selectedPerson || state.people[0], itemName, price);
+    }
 
-        function getTotalSubtotal() {
-            let totalSubtotal = 0;
-            state.people.forEach(p => {
-                (state.orders[p] || []).forEach(o => totalSubtotal += (o.price || 0) * (o.quantity || 0));
-            });
-            (state.sharedItems || []).forEach(item => {
-                if (item.sharedBy && item.sharedBy.length > 0) totalSubtotal += (item.price || 0) * (item.quantity || 0);
-            });
-            return totalSubtotal;
-        }
+    function removeOrder(personName, index) {
+      state.orders[personName].splice(index, 1);
+      renderAll();
+    }
 
-        function validateBillTotal() {
-            const totalBillInput = document.getElementById('total-bill');
-            const errorDiv = document.getElementById('bill-error');
-            const enteredTotalBill = parseFloat(totalBillInput.value) || 0;
-            const subtotal = getTotalSubtotal();
+    function updateOrderQuantity(personName, index, quantity) {
+      const qty = parseInt(quantity) || 0;
+      if (qty > 0) state.orders[personName][index].quantity = qty;
+      else state.orders[personName].splice(index, 1);
+      renderAll();
+    }
 
-            if (subtotal === 0 || enteredTotalBill === 0) {
-                errorDiv.classList.add('hidden');
-                return;
-            }
+    function addSharedItem() {
+      if (state.people.length === 0) { alert("Add a person first!"); return; }
+      state.sharedItems.push({ name: "", price: 0, quantity: 1, sharedBy: [...state.people] });
+      renderAll();
+    }
 
-            const taxRate = state.tax / 100;
-            const tipRate = state.tipMode === 'percent'
-                ? state.tip / 100
-                : (parseFloat(document.getElementById('tip-dollar').value) || 0) / subtotal;
+    function addSharedItemFromMenu(itemName, price) {
+      if (state.people.length === 0) { alert("Add a person first!"); return; }
+      state.sharedItems.push({ name: itemName, price: price, quantity: 1, sharedBy: [...state.people] });
+      renderAll();
+    }
 
-            const expectedTotalBill = subtotal * (1 + taxRate + tipRate);
+    function removeSharedItem(index) {
+      state.sharedItems.splice(index, 1);
+      renderAll();
+    }
 
-            if (Math.abs(enteredTotalBill - expectedTotalBill) > 0.05) {
-                errorDiv.textContent = `⚠️ Mismatch! Expected: $${expectedTotalBill.toFixed(2)}, Entered: $${enteredTotalBill.toFixed(2)}`;
-                errorDiv.classList.remove('hidden');
-            } else {
-                errorDiv.classList.add('hidden');
-            }
-        }
+    function updateSharedItem(idx, field, val) {
+      if (field === 'name') state.sharedItems[idx].name = val;
+      else state.sharedItems[idx][field] = parseFloat(val) || 0;
+      saveAndCalc();
+    }
 
-        function calculateBill() {
-            const totalBillInput = document.getElementById('total-bill');
-            const errorDiv = document.getElementById('bill-error');
-            const taxPercentInput = document.getElementById('tax-percent');
-            const tipPercentInput = document.getElementById('tip-percent');
-            const tipDollarInput = document.getElementById('tip-dollar');
+    function toggleSharedBy(itemIdx, name) {
+      const list = state.sharedItems[itemIdx].sharedBy;
+      const idx = list.indexOf(name);
+      if (idx > -1) list.splice(idx, 1);
+      else list.push(name);
+      saveAndCalc();
+    }
 
-            const taxPercent = parseFloat(taxPercentInput.value) || 0;
-            const enteredTotalBill = parseFloat(totalBillInput.value) || 0;
-            const subtotal = getTotalSubtotal();
+    function selectAllShared(index) {
+      state.sharedItems[index].sharedBy = [...state.people];
+      saveAndCalc();
+      renderAll();
+    }
 
-            if (subtotal === 0) {
-                errorDiv.textContent = "Please add items first.";
-                errorDiv.classList.remove('hidden');
-                return;
-            }
+    function clearAllShared(index) {
+      state.sharedItems[index].sharedBy = [];
+      saveAndCalc();
+      renderAll();
+    }
 
-            let tipPercent = 0;
-            if (state.tipMode === 'percent') {
-                tipPercent = parseFloat(tipPercentInput.value) || 0;
-            } else {
-                const tipDollar = parseFloat(tipDollarInput.value) || 0;
-                tipPercent = subtotal > 0 ? (tipDollar / subtotal * 100) : 0;
-            }
+    function resetAll() {
+      if (confirm("Clear everything and reset?")) {
+        localStorage.removeItem('bill_splitter_state');
+        location.reload(); // Simple reload to clear memory state
+      }
+    }
 
-            // Case 1: Reverse Calc Tax (Tip & Total Bill exists, Tax is 0)
-            if (tipPercent > 0 && enteredTotalBill > 0 && taxPercent === 0) {
-                const tipRate = tipPercent / 100;
-                const calculatedTaxPercent = ((enteredTotalBill / subtotal) - 1 - tipRate) * 100;
-
-                if (calculatedTaxPercent >= 0 && calculatedTaxPercent <= 100) {
-                    taxPercentInput.value = calculatedTaxPercent.toFixed(2);
-                    state.tax = calculatedTaxPercent;
-                    errorDiv.classList.add('hidden');
-                    saveAndCalc();
-                } else {
-                    errorDiv.textContent = `⚠️ Cannot calculate tax. Check inputs.`;
-                    errorDiv.classList.remove('hidden');
-                }
-            }
-            // Case 2: Reverse Calc Tip (Tax & Total Bill exists, Tip is 0)
-            else if (taxPercent > 0 && enteredTotalBill > 0 && tipPercent === 0) {
-                const taxRate = taxPercent / 100;
-                const calculatedTipPercent = ((enteredTotalBill / subtotal) - 1 - taxRate) * 100;
-
-                if (calculatedTipPercent >= 0 && calculatedTipPercent <= 100) {
-                    if (state.tipMode === 'percent') {
-                        tipPercentInput.value = calculatedTipPercent.toFixed(2);
-                    } else {
-                        tipDollarInput.value = (subtotal * calculatedTipPercent / 100).toFixed(2);
-                    }
-                    state.tip = calculatedTipPercent;
-                    errorDiv.classList.add('hidden');
-                    saveAndCalc();
-                } else {
-                    errorDiv.textContent = `⚠️ Cannot calculate tip. Check inputs.`;
-                    errorDiv.classList.remove('hidden');
-                }
-            }
-            // Case 3: Forward Calc Total Bill (Tax & Tip exists)
-            else if (taxPercent > 0 && tipPercent > 0) {
-                const taxRate = taxPercent / 100;
-                const tipRate = tipPercent / 100;
-                const expectedTotal = subtotal * (1 + taxRate + tipRate);
-
-                totalBillInput.value = expectedTotal.toFixed(2);
-                errorDiv.classList.add('hidden');
-                validateBillTotal();
-                saveAndCalc();
-            } else {
-                errorDiv.textContent = "Please enter tax and tip (or total bill) to calculate";
-                errorDiv.classList.remove('hidden');
-            }
-        }
-
-        function addPerson() {
-            const input = document.getElementById('person-input');
-            let name = input.value.trim();
-            if (!name) {
-                let friendNum = 1;
-                while (state.people.includes(`Friend ${friendNum}`)) friendNum++;
-                name = `Friend ${friendNum}`;
-            }
-            if (!state.people.includes(name)) {
-                state.people.push(name);
-                state.orders[name] = [];
-                if (!state.selectedPerson) state.selectedPerson = name;
-                input.value = '';
-                renderAll();
-            }
-        }
-
-        function selectPerson(name) { state.selectedPerson = name; renderAll(); }
-        function clearSelection() { state.selectedPerson = null; renderAll(); }
-
-        function removePerson(name) {
-            state.people = state.people.filter(p => p !== name);
-            delete state.orders[name];
-            state.sharedItems.forEach(item => {
-                if (item.sharedBy) item.sharedBy = item.sharedBy.filter(p => p !== name);
-            });
-            if (state.selectedPerson === name) state.selectedPerson = state.people[0] || null;
-            renderAll();
-        }
-
-        function selectRestaurant(name) {
-            state.selectedRestaurant = name;
-            renderAll();
-        }
-
-        function addOrder(personName, itemName, price) {
-            if (!state.orders[personName]) state.orders[personName] = [];
-            state.orders[personName].push({ itemName, quantity: 1, price });
-            renderAll();
-        }
-
-        function addOrderToSelectedPerson(itemName, price) {
-            if (state.people.length === 0) { alert("Add a person first!"); return; }
-            addOrder(state.selectedPerson || state.people[0], itemName, price);
-        }
-
-        function removeOrder(personName, index) {
-            state.orders[personName].splice(index, 1);
-            renderAll();
-        }
-
-        function updateOrderQuantity(personName, index, quantity) {
-            const qty = parseInt(quantity) || 0;
-            if (qty > 0) state.orders[personName][index].quantity = qty;
-            else state.orders[personName].splice(index, 1);
-            renderAll();
-        }
-
-        function addSharedItem() {
-            if (state.people.length === 0) { alert("Add a person first!"); return; }
-            state.sharedItems.push({ name: "", price: 0, quantity: 1, sharedBy: [...state.people] });
-            renderAll();
-        }
-
-        function addSharedItemFromMenu(itemName, price) {
-            if (state.people.length === 0) { alert("Add a person first!"); return; }
-            state.sharedItems.push({ name: itemName, price: price, quantity: 1, sharedBy: [...state.people] });
-            renderAll();
-        }
-
-        function removeSharedItem(index) {
-            state.sharedItems.splice(index, 1);
-            renderAll();
-        }
-
-        function updateSharedItem(idx, field, val) {
-            if (field === 'name') state.sharedItems[idx].name = val;
-            else state.sharedItems[idx][field] = parseFloat(val) || 0;
-            saveAndCalc();
-        }
-
-        function toggleSharedBy(itemIdx, name) {
-            const list = state.sharedItems[itemIdx].sharedBy;
-            const idx = list.indexOf(name);
-            if (idx > -1) list.splice(idx, 1);
-            else list.push(name);
-            saveAndCalc();
-        }
-
-        function selectAllShared(index) {
-            state.sharedItems[index].sharedBy = [...state.people];
-            saveAndCalc();
-            renderAll();
-        }
-
-        function clearAllShared(index) {
-            state.sharedItems[index].sharedBy = [];
-            saveAndCalc();
-            renderAll();
-        }
-
-        function resetAll() {
-            if(confirm("Clear everything and reset?")) {
-                localStorage.removeItem('bill_splitter_state');
-                location.reload(); // Simple reload to clear memory state
-            }
-        }
-
-        function renderAll() {
-            // Render People
-            const tags = document.getElementById('people-tags');
-            tags.innerHTML = state.people.map(p => `
+    function renderAll() {
+      // Render People
+      const tags = document.getElementById('people-tags');
+      tags.innerHTML = state.people.map(p => `
                 <span class="bg-slate-100 text-slate-700 pl-3 pr-1 py-1 rounded-md text-xs font-bold border ${state.selectedPerson === p ? 'border-amber-500 bg-amber-50 ring-1 ring-amber-500' : 'border-slate-200'} flex items-center cursor-pointer select-none"
                       onclick="selectPerson('${p.replace(/'/g, "\\'")}')">
                     ${p}
@@ -798,31 +925,31 @@
                 </span>
             `).join('');
 
-            const indicator = document.getElementById('selected-person-indicator');
-            const nameSpan = document.getElementById('selected-person-name');
-            if (state.selectedPerson && state.people.includes(state.selectedPerson)) {
-                indicator.classList.remove('hidden');
-                nameSpan.textContent = state.selectedPerson;
-            } else {
-                indicator.classList.add('hidden');
-            }
+      const indicator = document.getElementById('selected-person-indicator');
+      const nameSpan = document.getElementById('selected-person-name');
+      if (state.selectedPerson && state.people.includes(state.selectedPerson)) {
+        indicator.classList.remove('hidden');
+        nameSpan.textContent = state.selectedPerson;
+      } else {
+        indicator.classList.add('hidden');
+      }
 
-            renderRestaurantTabs();
-            renderMenu();
+      renderRestaurantTabs();
+      renderMenu();
 
-            // Render Orders
-            const container = document.getElementById('orders-container');
-            container.innerHTML = state.people.map(personName => {
-                const orders = state.orders[personName] || [];
-                return `
+      // Render Orders
+      const container = document.getElementById('orders-container');
+      container.innerHTML = state.people.map(personName => {
+        const orders = state.orders[personName] || [];
+        return `
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
                         <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
                             <h3 class="font-bold text-slate-900">${personName}'s Orders</h3>
                             <button onclick="selectPerson('${personName.replace(/'/g, "\\'")}')" class="text-xs text-amber-600 font-bold hover:underline">Select</button>
                         </div>
                         ${orders.length === 0 ?
-                            '<p class="text-xs text-slate-400 italic">No items ordered yet.</p>' :
-                            `<div class="space-y-2">
+            '<p class="text-xs text-slate-400 italic">No items ordered yet.</p>' :
+            `<div class="space-y-2">
                                 ${orders.map((order, idx) => `
                                     <div class="bg-white border border-slate-200 rounded-lg p-2 flex items-center justify-between group">
                                         <div class="flex-1 min-w-0 pr-2">
@@ -840,15 +967,15 @@
                                     </div>
                                 `).join('')}
                             </div>`
-                        }
+          }
                     </div>
                 `;
-            }).join('');
+      }).join('');
 
-            // Render Shared
-            const sharedRows = document.getElementById('shared-items-rows');
-            if (state.sharedItems.length > 0) {
-                sharedRows.innerHTML = state.sharedItems.map((item, i) => `
+      // Render Shared
+      const sharedRows = document.getElementById('shared-items-rows');
+      if (state.sharedItems.length > 0) {
+        sharedRows.innerHTML = state.sharedItems.map((item, i) => `
                     <tr class="group border-b border-slate-50 hover:bg-slate-50/50 transition">
                         <td class="py-2 px-2"><input type="text" value="${item.name}" oninput="updateSharedItem(${i}, 'name', this.value)" class="sheet-input text-xs" placeholder="Item Name"></td>
                         <td class="py-2 px-2"><input type="number" value="${item.price}" step="0.01" oninput="updateSharedItem(${i}, 'price', this.value)" class="sheet-input font-mono text-xs"></td>
@@ -870,51 +997,51 @@
                         <td class="py-2 px-2 text-center"><button onclick="removeSharedItem(${i})" class="text-slate-300 hover:text-red-500 text-lg">&times;</button></td>
                     </tr>
                 `).join('');
-            } else {
-                sharedRows.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-xs text-slate-400 italic">No shared items.</td></tr>';
-            }
+      } else {
+        sharedRows.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-xs text-slate-400 italic">No shared items.</td></tr>';
+      }
 
-            saveAndCalc();
+      saveAndCalc();
+    }
+
+    function calculate() {
+      const taxRate = state.tax / 100;
+      const totalSubtotal = getTotalSubtotal();
+
+      let tipRate = state.tipMode === 'percent'
+        ? state.tip / 100
+        : (totalSubtotal > 0 ? (parseFloat(document.getElementById('tip-dollar').value) || 0) / totalSubtotal : 0);
+
+      let totals = {};
+      state.people.forEach(p => totals[p] = { sub: 0 });
+
+      // Sum Individual
+      state.people.forEach(p => {
+        (state.orders[p] || []).forEach(o => totals[p].sub += (o.price || 0) * (o.quantity || 0));
+      });
+
+      // Sum Shared
+      (state.sharedItems || []).forEach(item => {
+        if (item.sharedBy && item.sharedBy.length > 0) {
+          const costPerPerson = ((item.price || 0) * (item.quantity || 0)) / item.sharedBy.length;
+          item.sharedBy.forEach(p => { if (totals[p]) totals[p].sub += costPerPerson; });
         }
+      });
 
-        function calculate() {
-            const taxRate = state.tax / 100;
-            const totalSubtotal = getTotalSubtotal();
+      const grid = document.getElementById('results-grid');
+      grid.innerHTML = '';
 
-            let tipRate = state.tipMode === 'percent'
-                ? state.tip / 100
-                : (totalSubtotal > 0 ? (parseFloat(document.getElementById('tip-dollar').value) || 0) / totalSubtotal : 0);
+      let grandTotal = 0;
+      state.people.forEach(p => {
+        const t = totals[p];
+        t.tax = t.sub * taxRate;
+        t.tip = t.sub * tipRate;
+        t.total = t.sub + t.tax + t.tip;
+        grandTotal += t.total;
+      });
 
-            let totals = {};
-            state.people.forEach(p => totals[p] = { sub: 0 });
-
-            // Sum Individual
-            state.people.forEach(p => {
-                (state.orders[p] || []).forEach(o => totals[p].sub += (o.price || 0) * (o.quantity || 0));
-            });
-
-            // Sum Shared
-            (state.sharedItems || []).forEach(item => {
-                if (item.sharedBy && item.sharedBy.length > 0) {
-                    const costPerPerson = ((item.price || 0) * (item.quantity || 0)) / item.sharedBy.length;
-                    item.sharedBy.forEach(p => { if (totals[p]) totals[p].sub += costPerPerson; });
-                }
-            });
-
-            const grid = document.getElementById('results-grid');
-            grid.innerHTML = '';
-
-            let grandTotal = 0;
-            state.people.forEach(p => {
-                const t = totals[p];
-                t.tax = t.sub * taxRate;
-                t.tip = t.sub * tipRate;
-                t.total = t.sub + t.tax + t.tip;
-                grandTotal += t.total;
-            });
-
-            // Summary Card
-            grid.innerHTML += `
+      // Summary Card
+      grid.innerHTML += `
                 <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 p-5 rounded-xl shadow-md col-span-full">
                     <h3 class="font-black text-slate-900 mb-3 border-b border-amber-200 pb-2">Summary</h3>
                     <div class="flex justify-between text-xs text-slate-600 mb-1"><span>Subtotal</span><span class="font-mono">$${totalSubtotal.toFixed(2)}</span></div>
@@ -927,10 +1054,10 @@
                 </div>
             `;
 
-            // Individual Cards
-            state.people.forEach(p => {
-                const t = totals[p];
-                grid.innerHTML += `
+      // Individual Cards
+      state.people.forEach(p => {
+        const t = totals[p];
+        grid.innerHTML += `
                     <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:shadow-md transition">
                         <h3 class="font-black text-slate-900 mb-3 border-b border-slate-100 pb-2 truncate">${p}</h3>
                         <div class="space-y-1.5 mb-4">
@@ -944,10 +1071,11 @@
                         </div>
                     </div>
                 `;
-            });
-        }
+      });
+    }
 
-        init();
-    </script>
+    init();
+  </script>
 </body>
+
 </html>
