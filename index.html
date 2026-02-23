@@ -512,6 +512,32 @@
       }
     }
 
+    function updateMenuItemPrice(index, newPrice) {
+      const menuList = state.restaurants[state.selectedRestaurant];
+      if (!menuList || !menuList[index]) return;
+      if (newPrice < 0) return;
+
+      const item = menuList[index];
+      const itemName = item.name;
+      item.price = newPrice;
+
+      // Update all orders that have this item
+      state.people.forEach(p => {
+        (state.orders[p] || []).forEach(o => {
+          if (o.itemName === itemName) o.price = newPrice;
+        });
+      });
+      // Update shared items that match
+      state.sharedItems.forEach(s => {
+        if (s.name === itemName) s.price = newPrice;
+      });
+
+      renderMenu();
+      renderAll();
+      saveAndCalc();
+      showToast(itemName + " price updated to $" + newPrice.toFixed(2));
+    }
+
     function deleteItemFromMenu(index) {
       const menuList = state.restaurants[state.selectedRestaurant];
       if (!menuList || !menuList[index]) return;
@@ -619,10 +645,16 @@
                             ${items.map(item => `
                                 <div class="menu-item bg-white border border-slate-200 rounded-lg p-3 hover:border-amber-300 hover:shadow-md relative group">
                                     <button onclick="deleteItemFromMenu(${item.originalIndex})" class="absolute top-1 right-1 text-slate-200 hover:text-red-400 hidden group-hover:block px-2">×</button>
-                                    <div class="flex justify-between items-start mb-1 cursor-pointer"
-                                         onclick="addOrderToSelectedPerson('${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                                        <span class="font-bold text-sm text-slate-900 pr-4">${item.name}</span>
-                                        <span class="font-mono text-sm text-amber-600">$${item.price.toFixed(2)}</span>
+                                    <div class="flex justify-between items-start mb-1 gap-2">
+                                        <span class="font-bold text-sm text-slate-900 flex-1 min-w-0 cursor-pointer"
+                                              onclick="addOrderToSelectedPerson('${item.name.replace(/'/g, "\\'")}', ${item.price})">${item.name}</span>
+                                        <label class="flex items-center shrink-0" onclick="event.stopPropagation()">
+                                            <span class="text-amber-600 font-mono text-sm mr-0.5">$</span>
+                                            <input type="number" step="0.01" min="0" value="${item.price}"
+                                                onchange="updateMenuItemPrice(${item.originalIndex}, parseFloat(this.value) || 0)"
+                                                onclick="event.stopPropagation()"
+                                                class="w-14 font-mono text-sm text-amber-600 border border-slate-200 hover:border-amber-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded px-1 py-0.5 text-right sheet-input">
+                                        </label>
                                     </div>
                                     <div class="flex gap-1 mt-2">
                                         <button onclick="event.stopPropagation(); addOrderToSelectedPerson('${item.name.replace(/'/g, "\\'")}', ${item.price})"
