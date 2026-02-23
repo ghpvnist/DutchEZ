@@ -11,6 +11,16 @@ Make bill splitting a Brie-ze.
 - Local storage for persistence
 - Responsive design
 
+## Firebase (optional)
+
+For **Create shared link** (real-time collaboration), you need a Firebase config:
+
+1. Copy `firebase-config.example.js` to `firebase-config.js`.
+2. Add your Firebase project config to `firebase-config.js` (see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)).
+3. **Do not commit** `firebase-config.js` — it's in `.gitignore`.
+
+Without `firebase-config.js`, the app still works: use **Copy link (URL)** to share. For publishing to public GitHub and securing your API key, see [SECURITY.md](SECURITY.md).
+
 ## Local Development
 
 To test the website locally, you have several options:

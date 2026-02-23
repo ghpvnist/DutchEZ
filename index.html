@@ -4,6 +4,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Optional: copy firebase-config.example.js to firebase-config.js and add your config (do not commit firebase-config.js). If missing, shared-link feature is disabled. -->
+  <script src="firebase-config.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const firebaseConfig = window.FIREBASE_CONFIG;
+
+    if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      const app = initializeApp(firebaseConfig);
+      getAnalytics(app);
+      const db = getFirestore(app);
+
+      window.firebaseGetBill = async (id) => {
+        const ref = doc(db, "bills", id);
+        const snap = await getDoc(ref);
+        return snap.exists() ? snap.data() : null;
+      };
+
+      window.firebaseSaveBill = async (id, state) => {
+        const ref = doc(db, "bills", id);
+        await setDoc(ref, {
+          state,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      };
+
+      window.firebaseSubscribeBill = (id, callback) => {
+        const ref = doc(db, "bills", id);
+        return onSnapshot(ref, (snap) => {
+          if (snap.exists()) callback(snap.data());
+        });
+      };
+    } else {
+      window.firebaseGetBill = async () => null;
+      window.firebaseSaveBill = async () => {};
+      window.firebaseSubscribeBill = () => () => {};
+    }
+  </script>
   <title>DutchEZ 🧀</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -100,15 +140,19 @@
         <h1 class="text-2xl font-bold tracking-tight">DutchEZ <span class="text-amber-500">🧀</span></h1>
         <p class="text-slate-600 text-sm">Make bill splitting a Brie-ze</p>
       </div>
-      <div class="flex gap-2">
-        <button onclick="copyShareLink()"
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="createSharedLink()"
           class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded transition flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
           </svg>
-          Copy Share Link
+          Create shared link
+        </button>
+        <button onclick="copyShareLink()"
+          class="bg-amber-500/80 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded transition">
+          Copy link (URL)
         </button>
         <button onclick="resetAll()"
           class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1 rounded transition">Reset</button>
@@ -374,18 +418,61 @@
       selectedPerson: null
     };
 
-    function init() {
-      // Load state logic
+    let currentBillId = null;
+    let firebaseUnsubscribe = null;
+    let firebaseSaveDebounceTimer = null;
+
+    function applyStateFromFirebase(data) {
+      if (!data || !data.state) return;
+      const loaded = data.state;
+      state = { ...state, ...loaded };
+      if (state.customMenuItems) delete state.customMenuItems;
+      if (!state.restaurants || Object.keys(state.restaurants).length === 0) {
+        state.restaurants = JSON.parse(JSON.stringify(DEMO_RESTAURANT));
+      }
       state.people.forEach(p => { if (!state.orders[p]) state.orders[p] = []; });
       if (!state.sharedItems) state.sharedItems = [];
+      if (!state.selectedPerson && state.people.length > 0) state.selectedPerson = state.people[0];
+      if (!state.taxMode) state.taxMode = 'percent';
+      if (!state.tipMode) state.tipMode = 'percent';
+    }
 
-      // Initial default selection
+    function init() {
+      state.people.forEach(p => { if (!state.orders[p]) state.orders[p] = []; });
+      if (!state.sharedItems) state.sharedItems = [];
       if (!state.selectedPerson && state.people.length > 0) state.selectedPerson = state.people[0];
 
-      // Priority 1: URL Parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const dataParam = urlParams.get('bill');
+      const firebaseId = urlParams.get('id');
 
+      if (firebaseId && typeof window.firebaseGetBill === 'function') {
+        currentBillId = firebaseId;
+        window.firebaseGetBill(firebaseId).then((data) => {
+          if (data && data.state) {
+            applyStateFromFirebase(data);
+            showToast("Loaded shared bill ✓");
+          } else {
+            showToast("Bill not found. Starting fresh.");
+          }
+          finishInit();
+          if (currentBillId && typeof window.firebaseSubscribeBill === 'function') {
+            if (firebaseUnsubscribe) firebaseUnsubscribe();
+            firebaseUnsubscribe = window.firebaseSubscribeBill(currentBillId, (data) => {
+              applyStateFromFirebase(data);
+              syncInputsFromState();
+              renderAll();
+            });
+          }
+        }).catch((e) => {
+          console.error("Firebase load error", e);
+          showToast("Could not load shared bill.");
+          currentBillId = null;
+          finishInit();
+        });
+        return;
+      }
+
+      const dataParam = urlParams.get('bill');
       if (dataParam) {
         try {
           const urlDecoded = decodeURIComponent(dataParam);
@@ -400,7 +487,6 @@
           alert("Invalid share link.");
         }
       } else {
-        // Priority 2: LocalStorage
         const saved = localStorage.getItem('bill_splitter_state');
         if (saved) {
           try {
@@ -411,6 +497,42 @@
         }
       }
 
+      finishInit();
+    }
+
+    function syncInputsFromState() {
+      const taxPercentInput = document.getElementById('tax-percent');
+      const taxDollarInput = document.getElementById('tax-dollar');
+      const taxToggleButton = document.getElementById('tax-mode-toggle');
+      const subtotalForInit = getTotalSubtotal();
+      if (state.taxMode === 'percent') {
+        taxPercentInput.value = state.tax;
+        taxPercentInput.classList.remove('hidden');
+        taxDollarInput.classList.add('hidden');
+        taxToggleButton.textContent = '%';
+      } else {
+        taxDollarInput.value = (subtotalForInit > 0 ? subtotalForInit * state.tax / 100 : 0).toFixed(2);
+        taxPercentInput.classList.add('hidden');
+        taxDollarInput.classList.remove('hidden');
+        taxToggleButton.textContent = '$';
+      }
+      const tipPercentInput = document.getElementById('tip-percent');
+      const tipDollarInput = document.getElementById('tip-dollar');
+      const toggleButton = document.getElementById('tip-mode-toggle');
+      if (state.tipMode === 'percent') {
+        tipPercentInput.value = state.tip;
+        tipPercentInput.classList.remove('hidden');
+        tipDollarInput.classList.add('hidden');
+        toggleButton.textContent = '%';
+      } else {
+        tipDollarInput.value = (subtotalForInit > 0 ? subtotalForInit * state.tip / 100 : 0).toFixed(2);
+        tipPercentInput.classList.add('hidden');
+        tipDollarInput.classList.remove('hidden');
+        toggleButton.textContent = '$';
+      }
+    }
+
+    function finishInit() {
       const restKeys = Object.keys(state.restaurants);
       if (restKeys.length > 0 && !state.restaurants[state.selectedRestaurant]) {
         state.selectedRestaurant = restKeys[0];
@@ -418,46 +540,51 @@
         state.restaurants["My Menu"] = [];
         state.selectedRestaurant = "My Menu";
       }
-
       if (!state.taxMode) state.taxMode = 'percent';
       if (!state.tipMode) state.tipMode = 'percent';
-
-      const taxPercentInput = document.getElementById('tax-percent');
-      const taxDollarInput = document.getElementById('tax-dollar');
-      const taxToggleButton = document.getElementById('tax-mode-toggle');
-      const subtotalForInit = getTotalSubtotal();
-
-      if (state.taxMode === 'percent') {
-        taxPercentInput.value = state.tax;
-        taxPercentInput.classList.remove('hidden');
-        taxDollarInput.classList.add('hidden');
-        taxToggleButton.textContent = '%';
-      } else {
-        const taxDollar = subtotalForInit > 0 ? (subtotalForInit * state.tax / 100) : 0;
-        taxDollarInput.value = taxDollar.toFixed(2);
-        taxPercentInput.classList.add('hidden');
-        taxDollarInput.classList.remove('hidden');
-        taxToggleButton.textContent = '$';
-      }
-
-      const tipPercentInput = document.getElementById('tip-percent');
-      const tipDollarInput = document.getElementById('tip-dollar');
-      const toggleButton = document.getElementById('tip-mode-toggle');
-
-      if (state.tipMode === 'percent') {
-        tipPercentInput.value = state.tip;
-        tipPercentInput.classList.remove('hidden');
-        tipDollarInput.classList.add('hidden');
-        toggleButton.textContent = '%';
-      } else {
-        const tipDollar = subtotalForInit > 0 ? (subtotalForInit * state.tip / 100) : 0;
-        tipDollarInput.value = tipDollar.toFixed(2);
-        tipPercentInput.classList.add('hidden');
-        tipDollarInput.classList.remove('hidden');
-        toggleButton.textContent = '$';
-      }
-
+      syncInputsFromState();
       renderAll();
+    }
+
+    function createSharedLink() {
+      if (typeof window.firebaseSaveBill !== 'function') {
+        showToast("Firebase not loaded. Use Copy link (URL) instead.");
+        return;
+      }
+      const id = Math.random().toString(36).slice(2, 10);
+      const shareUrl = window.location.origin + window.location.pathname + "?id=" + id;
+      window.firebaseSaveBill(id, state).then(() => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(() => {
+            showToast("Shared link copied! Share it so others can join.");
+          });
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = shareUrl;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            showToast("Shared link copied! Share it so others can join.");
+          } catch (err) {
+            prompt("Copy this link:", shareUrl);
+          }
+          document.body.removeChild(ta);
+        }
+        currentBillId = id;
+        window.history.replaceState({}, document.title, window.location.pathname + "?id=" + id);
+        if (firebaseUnsubscribe) firebaseUnsubscribe();
+        firebaseUnsubscribe = window.firebaseSubscribeBill(id, (data) => {
+          applyStateFromFirebase(data);
+          syncInputsFromState();
+          renderAll();
+        });
+      }).catch((e) => {
+        console.error(e);
+        showToast("Failed to create shared link.");
+      });
     }
 
     // --- Core Functions ---
@@ -739,6 +866,13 @@
         state.tip = totalSubtotal > 0 ? (tipDollar / totalSubtotal * 100) : 0;
       }
       localStorage.setItem('bill_splitter_state', JSON.stringify(state));
+      if (currentBillId && typeof window.firebaseSaveBill === 'function') {
+        if (firebaseSaveDebounceTimer) clearTimeout(firebaseSaveDebounceTimer);
+        firebaseSaveDebounceTimer = setTimeout(() => {
+          window.firebaseSaveBill(currentBillId, state).catch((e) => console.error("Firebase save error", e));
+          firebaseSaveDebounceTimer = null;
+        }, 600);
+      }
       calculate();
       validateBillTotal();
     }
@@ -1049,6 +1183,11 @@
       saveAndCalc();
       renderAll();
       showToast("Shared by: no one");
+    }
+
+    function refreshPage() {
+      showToast("Refreshing…");
+      location.reload();
     }
 
     function resetAll() {
