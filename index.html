@@ -646,8 +646,7 @@
                                 <div class="menu-item bg-white border border-slate-200 rounded-lg p-3 hover:border-amber-300 hover:shadow-md relative group">
                                     <button onclick="deleteItemFromMenu(${item.originalIndex})" class="absolute top-1 right-1 text-slate-200 hover:text-red-400 hidden group-hover:block px-2">×</button>
                                     <div class="flex justify-between items-start mb-1 gap-2">
-                                        <span class="font-bold text-sm text-slate-900 flex-1 min-w-0 cursor-pointer"
-                                              onclick="addOrderToSelectedPerson('${item.name.replace(/'/g, "\\'")}', ${item.price})">${item.name}</span>
+                                        <span class="font-bold text-sm text-slate-900 flex-1 min-w-0">${item.name}</span>
                                         <label class="flex items-center shrink-0" onclick="event.stopPropagation()">
                                             <span class="text-amber-600 font-mono text-sm mr-0.5">$</span>
                                             <input type="number" step="0.01" min="0" value="${item.price}"
