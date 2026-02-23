@@ -31,6 +31,14 @@
       display: none;
     }
 
+    /* Mobile-friendly touch targets (min 44px) */
+    @media (max-width: 768px) {
+      button:not(.no-min-touch) {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+
     .menu-item {
       transition: all 0.2s;
     }
@@ -192,11 +200,19 @@
       <section class="pt-6 border-t border-slate-100">
         <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">5. Final Breakdown</h2>
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tax (%)</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Tax</label>
+                <button id="tax-mode-toggle" onclick="toggleTaxMode()"
+                  class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-bold transition">
+                  %
+                </button>
+              </div>
               <input type="number" id="tax-percent" value="9.0" step="0.1" oninput="saveAndCalc(); validateBillTotal();"
                 class="sheet-input font-mono">
+              <input type="number" id="tax-dollar" step="0.01" placeholder="0.00"
+                oninput="saveAndCalc(); validateBillTotal();" class="sheet-input font-mono hidden">
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -231,7 +247,8 @@
   </div>
 
   <div id="copy-toast"
-    class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold animate-bounce z-50">
+    class="fixed bottom-6 left-4 right-4 md:left-1/2 md:right-auto md:max-w-sm md:-translate-x-1/2 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl text-sm font-bold z-50 text-center touch-none select-none"
+    role="status" aria-live="polite">
     Link Copied to Clipboard! 🚀
   </div>
 
@@ -352,6 +369,7 @@
       sharedItems: [],
       tax: 9.0,
       tip: 18.0,
+      taxMode: 'percent',
       tipMode: 'percent',
       selectedPerson: null
     };
@@ -401,8 +419,26 @@
         state.selectedRestaurant = "My Menu";
       }
 
-      document.getElementById('tax-percent').value = state.tax;
+      if (!state.taxMode) state.taxMode = 'percent';
       if (!state.tipMode) state.tipMode = 'percent';
+
+      const taxPercentInput = document.getElementById('tax-percent');
+      const taxDollarInput = document.getElementById('tax-dollar');
+      const taxToggleButton = document.getElementById('tax-mode-toggle');
+      const subtotalForInit = getTotalSubtotal();
+
+      if (state.taxMode === 'percent') {
+        taxPercentInput.value = state.tax;
+        taxPercentInput.classList.remove('hidden');
+        taxDollarInput.classList.add('hidden');
+        taxToggleButton.textContent = '%';
+      } else {
+        const taxDollar = subtotalForInit > 0 ? (subtotalForInit * state.tax / 100) : 0;
+        taxDollarInput.value = taxDollar.toFixed(2);
+        taxPercentInput.classList.add('hidden');
+        taxDollarInput.classList.remove('hidden');
+        taxToggleButton.textContent = '$';
+      }
 
       const tipPercentInput = document.getElementById('tip-percent');
       const tipDollarInput = document.getElementById('tip-dollar');
@@ -414,8 +450,7 @@
         tipDollarInput.classList.add('hidden');
         toggleButton.textContent = '%';
       } else {
-        const totalSubtotal = getTotalSubtotal();
-        const tipDollar = totalSubtotal > 0 ? (totalSubtotal * state.tip / 100) : 0;
+        const tipDollar = subtotalForInit > 0 ? (subtotalForInit * state.tip / 100) : 0;
         tipDollarInput.value = tipDollar.toFixed(2);
         tipPercentInput.classList.add('hidden');
         tipDollarInput.classList.remove('hidden');
@@ -432,24 +467,26 @@
       if (name && name.trim()) {
         const cleanName = name.trim();
         if (state.restaurants[cleanName]) {
-          alert("Menu name already exists.");
+          showToast("Menu name already exists.");
           return;
         }
         state.restaurants[cleanName] = [];
         state.selectedRestaurant = cleanName;
         renderAll();
+        showToast(cleanName + " menu created ✓");
       }
     }
 
     function deleteMenu(name) {
       if (Object.keys(state.restaurants).length <= 1) {
-        alert("You must have at least one menu.");
+        showToast("You must have at least one menu.");
         return;
       }
       if (confirm(`Delete menu "${name}" and all its items?`)) {
         delete state.restaurants[name];
         state.selectedRestaurant = Object.keys(state.restaurants)[0];
         renderAll();
+        showToast(name + " menu deleted");
       }
     }
 
@@ -469,8 +506,9 @@
         catInput.value = '';
         renderMenu();
         saveAndCalc();
+        showToast(name + " added to menu ✓");
       } else {
-        alert("Please enter a valid name and price.");
+        showToast("Please enter a valid name and price.");
       }
     }
 
@@ -518,6 +556,7 @@
         renderMenu();
         renderAll(); // Renders orders section too
         saveAndCalc();
+        showToast(itemName + " removed from menu");
       }
     }
 
@@ -654,7 +693,13 @@
     }
 
     function saveAndCalc() {
-      state.tax = parseFloat(document.getElementById('tax-percent').value) || 0;
+      if (state.taxMode === 'percent') {
+        state.tax = parseFloat(document.getElementById('tax-percent').value) || 0;
+      } else {
+        const taxDollar = parseFloat(document.getElementById('tax-dollar').value) || 0;
+        const totalSubtotal = getTotalSubtotal();
+        state.tax = totalSubtotal > 0 ? (taxDollar / totalSubtotal * 100) : 0;
+      }
       if (state.tipMode === 'percent') {
         state.tip = parseFloat(document.getElementById('tip-percent').value) || 0;
       } else {
@@ -665,6 +710,32 @@
       localStorage.setItem('bill_splitter_state', JSON.stringify(state));
       calculate();
       validateBillTotal();
+    }
+
+    function toggleTaxMode() {
+      const taxPercentInput = document.getElementById('tax-percent');
+      const taxDollarInput = document.getElementById('tax-dollar');
+      const toggleButton = document.getElementById('tax-mode-toggle');
+      const totalSubtotal = getTotalSubtotal();
+
+      if (state.taxMode === 'percent') {
+        state.taxMode = 'dollar';
+        const taxPercent = parseFloat(taxPercentInput.value) || 0;
+        const taxDollar = totalSubtotal > 0 ? (totalSubtotal * taxPercent / 100) : 0;
+        taxDollarInput.value = taxDollar.toFixed(2);
+        taxPercentInput.classList.add('hidden');
+        taxDollarInput.classList.remove('hidden');
+        toggleButton.textContent = '$';
+      } else {
+        state.taxMode = 'percent';
+        const taxDollar = parseFloat(taxDollarInput.value) || 0;
+        const taxPercent = totalSubtotal > 0 ? (taxDollar / totalSubtotal * 100) : 0;
+        taxPercentInput.value = taxPercent.toFixed(2);
+        taxDollarInput.classList.add('hidden');
+        taxPercentInput.classList.remove('hidden');
+        toggleButton.textContent = '%';
+      }
+      saveAndCalc();
     }
 
     function toggleTipMode() {
@@ -704,6 +775,20 @@
       return totalSubtotal;
     }
 
+    function getTaxRate() {
+      const subtotal = getTotalSubtotal();
+      if (state.taxMode === 'percent') return state.tax / 100;
+      if (subtotal <= 0) return 0;
+      return (parseFloat(document.getElementById('tax-dollar').value) || 0) / subtotal;
+    }
+
+    function getTipRate() {
+      const subtotal = getTotalSubtotal();
+      if (state.tipMode === 'percent') return state.tip / 100;
+      if (subtotal <= 0) return 0;
+      return (parseFloat(document.getElementById('tip-dollar').value) || 0) / subtotal;
+    }
+
     function validateBillTotal() {
       const totalBillInput = document.getElementById('total-bill');
       const errorDiv = document.getElementById('bill-error');
@@ -715,11 +800,8 @@
         return;
       }
 
-      const taxRate = state.tax / 100;
-      const tipRate = state.tipMode === 'percent'
-        ? state.tip / 100
-        : (parseFloat(document.getElementById('tip-dollar').value) || 0) / subtotal;
-
+      const taxRate = getTaxRate();
+      const tipRate = getTipRate();
       const expectedTotalBill = subtotal * (1 + taxRate + tipRate);
 
       if (Math.abs(enteredTotalBill - expectedTotalBill) > 0.05) {
@@ -734,10 +816,10 @@
       const totalBillInput = document.getElementById('total-bill');
       const errorDiv = document.getElementById('bill-error');
       const taxPercentInput = document.getElementById('tax-percent');
+      const taxDollarInput = document.getElementById('tax-dollar');
       const tipPercentInput = document.getElementById('tip-percent');
       const tipDollarInput = document.getElementById('tip-dollar');
 
-      const taxPercent = parseFloat(taxPercentInput.value) || 0;
       const enteredTotalBill = parseFloat(totalBillInput.value) || 0;
       const subtotal = getTotalSubtotal();
 
@@ -755,23 +837,36 @@
         tipPercent = subtotal > 0 ? (tipDollar / subtotal * 100) : 0;
       }
 
-      // Case 1: Reverse Calc Tax (Tip & Total Bill exists, Tax is 0)
-      if (tipPercent > 0 && enteredTotalBill > 0 && taxPercent === 0) {
-        const tipRate = tipPercent / 100;
-        const calculatedTaxPercent = ((enteredTotalBill / subtotal) - 1 - tipRate) * 100;
+      let taxPercent = 0;
+      if (state.taxMode === 'percent') {
+        taxPercent = parseFloat(taxPercentInput.value) || 0;
+      } else {
+        const taxDollar = parseFloat(taxDollarInput.value) || 0;
+        taxPercent = subtotal > 0 ? (taxDollar / subtotal * 100) : 0;
+      }
 
-        if (calculatedTaxPercent >= 0 && calculatedTaxPercent <= 100) {
-          taxPercentInput.value = calculatedTaxPercent.toFixed(2);
-          state.tax = calculatedTaxPercent;
+      // Case 1: Reverse Calc Tax (Tip & Total Bill filled — solve for tax)
+      if (tipPercent > 0 && enteredTotalBill > 0) {
+        const tipRate = tipPercent / 100;
+        const calculatedTaxRate = (enteredTotalBill / subtotal) - 1 - tipRate;
+        const calculatedTaxPercent = calculatedTaxRate * 100;
+
+        if (calculatedTaxPercent >= -1 && calculatedTaxPercent <= 100) {
+          state.tax = Math.max(0, calculatedTaxPercent);
+          if (state.taxMode === 'percent') {
+            taxPercentInput.value = state.tax.toFixed(2);
+          } else {
+            taxDollarInput.value = (subtotal * state.tax / 100).toFixed(2);
+          }
           errorDiv.classList.add('hidden');
+          showToast("Tax calculated from total bill & tip ✓");
           saveAndCalc();
-        } else {
-          errorDiv.textContent = `⚠️ Cannot calculate tax. Check inputs.`;
-          errorDiv.classList.remove('hidden');
+          return;
         }
       }
+
       // Case 2: Reverse Calc Tip (Tax & Total Bill exists, Tip is 0)
-      else if (taxPercent > 0 && enteredTotalBill > 0 && tipPercent === 0) {
+      if (taxPercent > 0 && enteredTotalBill > 0 && tipPercent === 0) {
         const taxRate = taxPercent / 100;
         const calculatedTipPercent = ((enteredTotalBill / subtotal) - 1 - taxRate) * 100;
 
@@ -783,26 +878,27 @@
           }
           state.tip = calculatedTipPercent;
           errorDiv.classList.add('hidden');
+          showToast("Tip calculated from total bill & tax ✓");
           saveAndCalc();
-        } else {
-          errorDiv.textContent = `⚠️ Cannot calculate tip. Check inputs.`;
-          errorDiv.classList.remove('hidden');
+          return;
         }
       }
-      // Case 3: Forward Calc Total Bill (Tax & Tip exists)
-      else if (taxPercent > 0 && tipPercent > 0) {
+
+      // Case 3: Forward Calc Total Bill (Tax & Tip known)
+      if (taxPercent > 0 && tipPercent > 0) {
         const taxRate = taxPercent / 100;
         const tipRate = tipPercent / 100;
         const expectedTotal = subtotal * (1 + taxRate + tipRate);
-
         totalBillInput.value = expectedTotal.toFixed(2);
         errorDiv.classList.add('hidden');
+        showToast("Total bill calculated ✓");
         validateBillTotal();
         saveAndCalc();
-      } else {
-        errorDiv.textContent = "Please enter tax and tip (or total bill) to calculate";
-        errorDiv.classList.remove('hidden');
+        return;
       }
+
+      errorDiv.textContent = "Enter total bill and tip to calculate tax, or tax and tip to get total.";
+      errorDiv.classList.remove('hidden');
     }
 
     function addPerson() {
@@ -819,11 +915,16 @@
         if (!state.selectedPerson) state.selectedPerson = name;
         input.value = '';
         renderAll();
+        showToast(name + " added ✓");
       }
     }
 
-    function selectPerson(name) { state.selectedPerson = name; renderAll(); }
-    function clearSelection() { state.selectedPerson = null; renderAll(); }
+    function selectPerson(name) {
+      state.selectedPerson = name;
+      renderAll();
+      showToast(name + " selected");
+    }
+    function clearSelection() { state.selectedPerson = null; renderAll(); showToast("Selection cleared"); }
 
     function removePerson(name) {
       state.people = state.people.filter(p => p !== name);
@@ -833,11 +934,13 @@
       });
       if (state.selectedPerson === name) state.selectedPerson = state.people[0] || null;
       renderAll();
+      showToast(name + " removed");
     }
 
     function selectRestaurant(name) {
       state.selectedRestaurant = name;
       renderAll();
+      showToast("Switched to " + name);
     }
 
     function addOrder(personName, itemName, price) {
@@ -847,13 +950,17 @@
     }
 
     function addOrderToSelectedPerson(itemName, price) {
-      if (state.people.length === 0) { alert("Add a person first!"); return; }
-      addOrder(state.selectedPerson || state.people[0], itemName, price);
+      if (state.people.length === 0) { showToast("Add a person first!"); return; }
+      const person = state.selectedPerson || state.people[0];
+      addOrder(person, itemName, price);
+      showToast(itemName + " added to " + person + " ✓");
     }
 
     function removeOrder(personName, index) {
+      const itemName = (state.orders[personName] || [])[index]?.itemName;
       state.orders[personName].splice(index, 1);
       renderAll();
+      if (itemName) showToast(itemName + " removed from order");
     }
 
     function updateOrderQuantity(personName, index, quantity) {
@@ -861,23 +968,28 @@
       if (qty > 0) state.orders[personName][index].quantity = qty;
       else state.orders[personName].splice(index, 1);
       renderAll();
+      showToast("Quantity updated ✓");
     }
 
     function addSharedItem() {
-      if (state.people.length === 0) { alert("Add a person first!"); return; }
+      if (state.people.length === 0) { showToast("Add a person first!"); return; }
       state.sharedItems.push({ name: "", price: 0, quantity: 1, sharedBy: [...state.people] });
       renderAll();
+      showToast("Shared item added ✓");
     }
 
     function addSharedItemFromMenu(itemName, price) {
-      if (state.people.length === 0) { alert("Add a person first!"); return; }
+      if (state.people.length === 0) { showToast("Add a person first!"); return; }
       state.sharedItems.push({ name: itemName, price: price, quantity: 1, sharedBy: [...state.people] });
       renderAll();
+      showToast(itemName + " added as shared item ✓");
     }
 
     function removeSharedItem(index) {
+      const name = state.sharedItems[index]?.name || "Item";
       state.sharedItems.splice(index, 1);
       renderAll();
+      showToast(name + " removed from shared");
     }
 
     function updateSharedItem(idx, field, val) {
@@ -898,17 +1010,20 @@
       state.sharedItems[index].sharedBy = [...state.people];
       saveAndCalc();
       renderAll();
+      showToast("Shared by: everyone ✓");
     }
 
     function clearAllShared(index) {
       state.sharedItems[index].sharedBy = [];
       saveAndCalc();
       renderAll();
+      showToast("Shared by: no one");
     }
 
     function resetAll() {
       if (confirm("Clear everything and reset?")) {
         localStorage.removeItem('bill_splitter_state');
+        showToast("Resetting…");
         location.reload(); // Simple reload to clear memory state
       }
     }
@@ -1005,12 +1120,9 @@
     }
 
     function calculate() {
-      const taxRate = state.tax / 100;
       const totalSubtotal = getTotalSubtotal();
-
-      let tipRate = state.tipMode === 'percent'
-        ? state.tip / 100
-        : (totalSubtotal > 0 ? (parseFloat(document.getElementById('tip-dollar').value) || 0) / totalSubtotal : 0);
+      const taxRate = getTaxRate();
+      const tipRate = getTipRate();
 
       let totals = {};
       state.people.forEach(p => totals[p] = { sub: 0 });
@@ -1040,13 +1152,15 @@
         grandTotal += t.total;
       });
 
+      const taxLabel = state.taxMode === 'percent' ? `Tax (${state.tax}%)` : 'Tax ($)';
+      const tipLabel = state.tipMode === 'percent' ? `Tip (${(tipRate * 100).toFixed(2)}%)` : 'Tip ($)';
       // Summary Card
       grid.innerHTML += `
                 <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 p-5 rounded-xl shadow-md col-span-full">
                     <h3 class="font-black text-slate-900 mb-3 border-b border-amber-200 pb-2">Summary</h3>
                     <div class="flex justify-between text-xs text-slate-600 mb-1"><span>Subtotal</span><span class="font-mono">$${totalSubtotal.toFixed(2)}</span></div>
-                    <div class="flex justify-between text-xs text-slate-600 mb-1"><span>Tax (${state.tax}%)</span><span class="font-mono">$${(totalSubtotal * taxRate).toFixed(2)}</span></div>
-                    <div class="flex justify-between text-xs text-slate-600 mb-4"><span>Tip (${(tipRate * 100).toFixed(2)}%)</span><span class="font-mono">$${(totalSubtotal * tipRate).toFixed(2)}</span></div>
+                    <div class="flex justify-between text-xs text-slate-600 mb-1"><span>${taxLabel}</span><span class="font-mono">$${(totalSubtotal * taxRate).toFixed(2)}</span></div>
+                    <div class="flex justify-between text-xs text-slate-600 mb-4"><span>${tipLabel}</span><span class="font-mono">$${(totalSubtotal * tipRate).toFixed(2)}</span></div>
                     <div class="flex justify-between items-end pt-2 border-t border-amber-200">
                         <span class="text-xs font-black uppercase text-amber-600">Grand Total</span>
                         <span class="text-2xl font-mono font-bold text-amber-900">$${grandTotal.toFixed(2)}</span>
